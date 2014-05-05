@@ -10,15 +10,6 @@ require 'lupo'
 module Ramom
   class Entity
 
-    # An undefined value useful for default params
-    Undefined = Class.new.freeze
-
-    # An empty frozen array
-    EMPTY_ARRAY = [].freeze
-
-    # An empty frozen array
-    EMPTY_HASH = {}.freeze
-
     def self.registry(environment)
       Registry.new(environment.definitions.each_with_object({}) {
         |(name, definition), hash|

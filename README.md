@@ -1,4 +1,4 @@
-# ramom (relational algebra meets object mapping)
+# ramom
 
 [![Gem Version](https://badge.fury.io/rb/ramom.png)][gem]
 [![Build Status](https://secure.travis-ci.org/snusnu/ramom.png?branch=master)][travis]

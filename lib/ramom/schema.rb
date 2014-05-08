@@ -40,7 +40,7 @@ module Ramom
     end # Builder
   end # Relation
 
-  class Schema
+  class Schema < BasicObject
     class Definition
       class Builder
 
@@ -59,14 +59,13 @@ module Ramom
               hash[relation.name] = relation
             }
           end
-
-        end
+        end # DM
 
         class Context
 
           class Future
             include Concord::Public.new(:name, :body)
-          end
+          end # Future
 
           include Concord::Public.new(:base, :virtual)
 
@@ -97,7 +96,6 @@ module Ramom
         def call
           Definition.new(Context.call(base, virtual, &block))
         end
-
       end # Builder
 
       class Resolver
@@ -149,7 +147,7 @@ module Ramom
           relations = Compiler::Base.call(base_relations, relations)
           relations = Compiler::Virtual.call(@virtual_relations, relations)
 
-          Class.new(Database) { include(relations) }
+          Class.new(Schema) { include(relations) }
         end
 
         private
@@ -163,7 +161,6 @@ module Ramom
         def base_relation(_name, relation)
           relation # This is a NOOP because I use DM1 base relations
         end
-
       end # Resolver
 
       include Concord.new(:context)
@@ -176,23 +173,9 @@ module Ramom
         @base_relations    = context.base
         @virtual_relations = context.virtual
       end
-
     end # Definition
 
-    include Lupo.collection(:relations)
-
-    def self.define(base_relations, virtual_relations = EMPTY_HASH, &block)
-      Definition::Builder.call(base_relations, virtual_relations, block)
-    end
-
-    def [](name)
-      @relations.fetch(name)
-    end
-  end # Schema
-
-  class Database < BasicObject
-
-    class Builder < Schema::Definition::Resolver
+    class Builder < Definition::Resolver
 
       def initialize(adapter, schema_definition)
         super(schema_definition)
@@ -204,8 +187,11 @@ module Ramom
       def base_relation(_, relation)
         Axiom::Relation::Gateway.new(@adapter, relation)
       end
-
     end # Builder
+
+    def self.define(base_relations, virtual_relations = EMPTY_HASH, &block)
+      Definition::Builder.call(base_relations, virtual_relations, block)
+    end
 
     def self.build(*args)
       coerce(*args).new
@@ -214,8 +200,7 @@ module Ramom
     def self.coerce(adapter, schema_definition)
       Builder.call(adapter, schema_definition)
     end
-
-  end # Database
+  end # Schema
 
   class Mapping
 
@@ -238,20 +223,16 @@ module Ramom
   end # Mapping
 
   class Reader
-    include Concord.new(:database, :mapping)
+    include Concord.new(:schema, :mapping)
 
     def self.build(adapter, schema_definition, mapping)
-      new(Database.build(adapter, schema_definition), mapping)
+      new(Schema.build(adapter, schema_definition), mapping)
     end
 
     def read(name, *args)
       relation(name, *args).map do |tuple|
         mapping[name].load(tuple)
       end
-    end
-
-    def query(&block)
-      database.query(&block)
     end
 
     def one(name, *args, &block)
@@ -269,7 +250,7 @@ module Ramom
     private
 
     def relation(name, *args)
-      database.__send__(name, *args)
+      schema.__send__(name, *args)
     end
-  end
+  end # Reader
 end # Ramom

@@ -8,7 +8,7 @@ module Ramom
         class Context
 
           class Future
-            include Concord::Public.new(:name, :body)
+            include Concord::Public.new(:name, :visibility, :body)
           end # Future
 
           include Concord::Public.new(:base, :virtual)
@@ -28,8 +28,16 @@ module Ramom
             raise NotImplementedError
           end
 
-          def relation(name, &block)
-            virtual[name] = Future.new(name, block)
+          def internal(name, &block)
+            relation(name, :private, &block)
+          end
+
+          def external(name, &block)
+            relation(name, :public, &block)
+          end
+
+          def relation(name, visibility, &block)
+            virtual[name] = Future.new(name, visibility, block)
           end
         end # Context
 

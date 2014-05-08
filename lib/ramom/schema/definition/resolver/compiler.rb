@@ -18,6 +18,7 @@ module Ramom
               container.module_eval do
                 relations.each do |(name, relation)|
                   define_method(name) { relation }
+                  public(name)
                 end
               end
               container
@@ -30,6 +31,7 @@ module Ramom
               container.module_eval do
                 relations.each do |(name, relation)|
                   define_method(name, &relation.body)
+                  send(relation.visibility, name)
                 end
               end
               container

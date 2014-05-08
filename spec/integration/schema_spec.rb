@@ -65,22 +65,25 @@ describe Ramom do
 
   schema_definition = Ramom::Schema.define(base_relations) do
 
-    relation :actors do |account_id|
+    external :actors do |account_id|
       people.
         join(accounts.restrict(account_id: account_id)).
         wrap(account: [:account_id, :account_email])
     end
 
-    relation :person_details do |account_id|
+    external :person_details do |account_id|
       actors(account_id).
         join(tasks).
         group(tasks: [:task_id, :task_name])
     end
 
-    relation :task_details do |account_id|
-      tasks.
-        join(actors(account_id)).
+    external :task_details do |account_id|
+      task_actors(account_id).
         wrap(person: [:person_id, :person_name, :account])
+    end
+
+    internal :task_actors do |account_id|
+      tasks.join(actors(account_id))
     end
 
   end
@@ -218,5 +221,9 @@ describe Ramom do
     t = dp.tasks.first
     expect(t.id).to eq(task.id)
     expect(t.name).to eq(task.name)
+
+    expect {
+      DB.reader.task_actors(1).one
+    }.to raise_error(NoMethodError)
   end
 end

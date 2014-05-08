@@ -57,7 +57,7 @@ describe Ramom do
     tasks:   [{name: 'test'}]
   )
 
-  # (2) Initialize a new Ramom::Relation::Schema
+  # (2) Initialize a new Ramom::Schema
 
   models          = DataMapper::Model.descendants
   base_relations  = Ramom::Schema::Definition::Builder::DM.call(models)

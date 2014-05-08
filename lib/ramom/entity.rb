@@ -1,12 +1,5 @@
 # encoding: utf-8
 
-require 'concord'
-require 'anima'
-require 'morpher'
-require 'adamantium'
-require 'abstract_type'
-require 'lupo'
-
 module Ramom
   class Entity
 
@@ -45,4 +38,3 @@ module Ramom
     end
   end # Entity
 end # Ramom
-

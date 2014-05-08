@@ -1,9 +1,12 @@
 # encoding: utf-8
 
+require 'concord'
 require 'anima'
+require 'morpher'
 require 'lupo'
 require 'procto'
-require 'morpher'
+require 'adamantium'
+require 'abstract_type'
 
 require 'axiom'
 require 'axiom-types'

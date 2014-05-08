@@ -177,11 +177,11 @@ describe Ramom do
     expect(person.name).to eq('snusnu')
     expect(person.account_id).to eql(account.id)
 
-    a = DB.read(:accounts).to_a.first
+    a = DB.read(:accounts).first
     expect(a.id).to_not be(nil)
     expect(a.email).to eq('test@test.com')
 
-    p = DB.read(:people).to_a.first
+    p = DB.read(:people).first
     expect(p.id).to_not be(nil)
     expect(p.name).to eq('snusnu')
     expect(p.account_id).to eql(account.id)

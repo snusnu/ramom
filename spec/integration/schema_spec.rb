@@ -11,7 +11,7 @@ require 'axiom-do-adapter'
 require 'ramom/entity'
 require 'ramom/schema'
 
-describe Ramom::Schema do
+describe Ramom do
 
   # (1) Setup and define tables with DataMapper
 
@@ -60,36 +60,31 @@ describe Ramom::Schema do
   # (2) Initialize a new Ramom::Relation::Schema
 
   models          = DataMapper::Model.descendants
-  base_relations  = Ramom::Relation::Schema::Definition::Builder::DM.call(models)
+  base_relations  = Ramom::Schema::Definition::Builder::DM.call(models)
 
-  schema_definition = Ramom::Relation::Schema.define(base_relations) do
+  schema_definition = Ramom::Schema.define(base_relations) do
 
-    relation(:actors) do
+    relation :actors do |account_id|
       people.
-        join(accounts).
+        join(accounts.restrict(account_id: account_id)).
         wrap(account: [:account_id, :account_email])
     end
 
-    relation :person_details do
-      actors.
+    relation :person_details do |account_id|
+      actors(account_id).
         join(tasks).
         group(tasks: [:task_id, :task_name])
     end
 
-    relation :task_details do
+    relation :task_details do |account_id|
       tasks.
-        join(actors).
+        join(actors(account_id)).
         wrap(person: [:person_id, :person_name, :account])
     end
 
   end
 
-  # (3) Connect the relation schema to a database
-
-  adapter  = Axiom::Adapter::DataObjects.new(uri)
-  database = Ramom::Database.build(:test, adapter, schema_definition)
-
-  # (4) Define domain DTOs
+  # (3) Define domain DTOs
 
   entity_registry = Ramom::Entity::Definition::Registry.build(guard: false) do
 
@@ -154,9 +149,9 @@ describe Ramom::Schema do
   models   = entity_registry.models(:anima)
   entities = entity_registry.environment(models)
 
-  # (5) Connect schema relations with DTO mappers
+  # (4) Connect schema relations with DTO mappers
 
-  schema = Ramom::Schema.build(database, entities) do
+  mapping = Ramom::Mapping.new(entities) do
     map :accounts,       :account
     map :people,         :person
     map :tasks,          :task
@@ -165,39 +160,45 @@ describe Ramom::Schema do
     map :actors,         :actor
   end
 
+  # (5) Connect the relation schema to a database
+
+  adapter = Axiom::Adapter::DataObjects.new(uri)
+
+  DB = Ramom::Reader.build(adapter, schema_definition, mapping)
+
   it 'provides access to base relations' do
 
-    account = schema[:accounts].sort.one
+    account = DB.one(:accounts)
     expect(account.id).to_not be(nil)
     expect(account.email).to eq('test@test.com')
 
-    person = schema[:people].sort.one
+    person = DB.one(:people)
     expect(person.id).to_not be(nil)
     expect(person.name).to eq('snusnu')
     expect(person.account_id).to eql(account.id)
 
-    a = schema[:accounts].to_a.first
+    a = DB.read(:accounts).to_a.first
     expect(a.id).to_not be(nil)
     expect(a.email).to eq('test@test.com')
 
-    p = schema[:people].to_a.first
+    p = DB.read(:people).to_a.first
     expect(p.id).to_not be(nil)
     expect(p.name).to eq('snusnu')
     expect(p.account_id).to eql(account.id)
   end
 
   it 'provides access to virtual relations' do
-    account = schema[:accounts].sort.one
-    person  = schema[:people].sort.one
-    task    = schema[:tasks].sort.one
+    account = DB.one(:accounts)
+    person  = DB.one(:people)
+    task    = DB.one(:tasks)
 
-    a = schema[:actors].to_a.first
+    a = DB.one(:actors, 1)
     expect(a.id).to eq(person.id)
     expect(a.name).to eq(person.name)
     expect(a.account.id).to eq(account.id)
     expect(a.account.email).to eq(account.email)
 
-    dt = schema[:task_details].to_a.first
+    dt = DB.one(:task_details, 1)
     expect(dt.id).to eq(task.id)
     expect(dt.name).to eq(task.name)
     expect(dt.person.id).to eq(person.id)
@@ -205,7 +206,7 @@ describe Ramom::Schema do
     expect(dt.person.account.id).to eql(account.id)
     expect(dt.person.account.email).to eql(account.email)
 
-    dp = schema[:person_details].to_a.first
+    dp = DB.one(:person_details, 1)
     expect(dp.id).to eq(person.id)
     expect(dp.name).to eq(person.name)
     expect(dp.account.id).to eq(account.id)

@@ -223,7 +223,7 @@ describe Ramom do
     expect(t.name).to eq(task.name)
 
     expect {
-      DB.reader.task_actors(1).one
+      DB.schema.task_actors(1).one
     }.to raise_error(NoMethodError)
   end
 end

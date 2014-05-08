@@ -221,6 +221,11 @@ describe Ramom do
     expect(t.id).to eq(task.id)
     expect(t.name).to eq(task.name)
 
+    tuple  = DB.schema.actors(1).sort.one
+    mapper = DB.mapping[:actors]
+
+    expect(mapper.load(tuple)).to eql(a)
+
     expect {
       DB.schema.task_actors(1).one
     }.to raise_error(NoMethodError)

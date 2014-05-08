@@ -72,8 +72,7 @@ describe Ramom do
     end
 
     external :person_details do |account_id|
-      actors(account_id).
-        join(tasks).
+      task_actors(account_id).
         group(tasks: [:task_id, :task_name])
     end
 

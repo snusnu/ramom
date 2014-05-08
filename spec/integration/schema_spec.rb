@@ -8,8 +8,9 @@ require 'dm-migrations'
 require 'axiom'
 require 'axiom-do-adapter'
 
-require 'ramom/entity'
-require 'ramom/schema'
+require 'ramom'
+require 'ramom/relation/builder/dm'
+require 'ramom/schema/definition/builder/dm'
 
 describe Ramom do
 

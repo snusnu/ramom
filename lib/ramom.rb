@@ -5,6 +5,11 @@ require 'lupo'
 require 'procto'
 require 'morpher'
 
+require 'axiom'
+require 'axiom-types'
+require 'axiom-optimizer'
+require 'axiom-do-adapter'
+
 # Relational Algebra meets Object Mapping
 module Ramom
 
@@ -23,7 +28,7 @@ module Ramom
 end # Ramom
 
 require 'ramom/version'
-require 'ramom/schema'
+
 require 'ramom/entity'
 require 'ramom/entity/definition'
 require 'ramom/entity/definition/registry'
@@ -42,3 +47,12 @@ require 'ramom/entity/model/builder/anima'
 require 'ramom/entity/mapper'
 require 'ramom/entity/environment'
 require 'ramom/entity/registry'
+
+require 'ramom/relation/builder'
+require 'ramom/schema/definition'
+require 'ramom/schema/definition/builder'
+require 'ramom/schema/definition/resolver'
+require 'ramom/schema/definition/resolver/compiler'
+require 'ramom/schema'
+require 'ramom/mapping'
+require 'ramom/reader'

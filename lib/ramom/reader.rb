@@ -32,7 +32,7 @@ module Ramom
       end
     end # Loader
 
-    include Concord.new(:schema, :mapping)
+    include Concord::Public.new(:schema, :mapping)
 
     def self.build(adapter, schema_definition, mapping)
       new(Schema.build(adapter, schema_definition), mapping)

@@ -177,11 +177,13 @@ describe Ramom do
     expect(person.name).to eq('snusnu')
     expect(person.account_id).to eql(account.id)
 
-    a = DB.read(:accounts).first
+    # TODO find out why a relation needs to be sorted for #one
+    a = DB.read(:accounts).sort.one
     expect(a.id).to_not be(nil)
     expect(a.email).to eq('test@test.com')
 
-    p = DB.read(:people).first
+    # TODO find out why a relation needs to be sorted for #one
+    p = DB.read(:people).sort.one
     expect(p.id).to_not be(nil)
     expect(p.name).to eq('snusnu')
     expect(p.account_id).to eql(account.id)

@@ -223,6 +223,36 @@ module Ramom
   end # Mapping
 
   class Reader
+
+    class Loader
+      include Concord.new(:relation, :mapper)
+      include Enumerable
+
+      def each(&block)
+        return to_enum unless block
+        relation.each { |tuple| yield(mapper.load(tuple)) }
+        self
+      end
+
+      def one(&block)
+        mapper.load(relation.one(&block))
+      end
+
+      def sort
+        new(relation.sort)
+      end
+
+      def sort_by(&block)
+        new(relation.sort_by(&block))
+      end
+
+      private
+
+      def new(new_relation)
+        self.class.new(new_relation, mapper)
+      end
+    end # Loader
+
     include Concord.new(:schema, :mapping)
 
     def self.build(adapter, schema_definition, mapping)
@@ -230,21 +260,11 @@ module Ramom
     end
 
     def read(name, *args)
-      relation(name, *args).map do |tuple|
-        mapping[name].load(tuple)
-      end
+      Loader.new(relation(name, *args), mapping[name])
     end
 
     def one(name, *args, &block)
-      mapping[name].load(sort(name, *args).one(&block))
-    end
-
-    def sort(name, *args)
-      relation(name, *args).sort
-    end
-
-    def sort_by(name, *args, &block)
-      relation(name, *args).sort_by(&block)
+      Loader.new(relation(name, *args), mapping[name]).sort.one(&block)
     end
 
     private

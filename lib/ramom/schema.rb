@@ -250,7 +250,7 @@ module Ramom
     private
 
     def relation(name, *args)
-      schema.__send__(name, *args)
+      schema.__send__(name, *args).optimize
     end
   end # Reader
 end # Ramom

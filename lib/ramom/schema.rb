@@ -190,7 +190,7 @@ module Ramom
     end
   end # Schema
 
-  class Database #< BasicObject
+  class Database < BasicObject
 
     class Builder < Schema::Definition::Resolver
 
@@ -269,7 +269,7 @@ module Ramom
     private
 
     def relation(name, *args)
-      database.public_send(name, *args)
+      database.__send__(name, *args)
     end
   end
 end # Ramom

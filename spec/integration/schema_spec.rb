@@ -212,7 +212,7 @@ describe Ramom do
     expect(dp.account.id).to eq(account.id)
     expect(dp.account.email).to eq(account.email)
 
-    t = dp.tasks.to_a.first
+    t = dp.tasks.first
     expect(t.id).to eq(task.id)
     expect(t.name).to eq(task.name)
   end

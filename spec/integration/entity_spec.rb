@@ -28,11 +28,6 @@ describe 'entity mapping' do
 
     registry = Ramom::Entity::Definition::Registry.build(key: :symbolize) do
 
-      register(:company) do
-        map :id
-        map :name
-      end
-
       register(:contact) do
         map :email, :String, from: :email_address
         map :phone, :String

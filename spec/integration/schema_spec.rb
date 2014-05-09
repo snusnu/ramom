@@ -167,43 +167,38 @@ describe Ramom do
 
   adapter = Axiom::Adapter::DataObjects.new(uri)
 
-  DB = Ramom::Reader.build(adapter, schema_definition, mapping)
+  let(:db) { Ramom::Reader.build(adapter, schema_definition, mapping) }
+
+  let(:account) { db.one(:accounts) }
+  let(:person)  { db.one(:people) }
+  let(:task)    { db.one(:tasks) }
 
   it 'provides access to base relations' do
-
-    account = DB.one(:accounts)
     expect(account.id).to_not be(nil)
     expect(account.email).to eq('test@test.com')
 
-    person = DB.one(:people)
     expect(person.id).to_not be(nil)
     expect(person.name).to eq('snusnu')
     expect(person.account_id).to eql(account.id)
 
-    # TODO find out why a relation needs to be sorted for #one
-    a = DB.read(:accounts).sort.one
-    expect(a.id).to_not be(nil)
-    expect(a.email).to eq('test@test.com')
+    a = db.read(:accounts).sort.one
+    expect(a.id).to eq(account.id)
+    expect(a.email).to eq(account.email)
 
-    # TODO find out why a relation needs to be sorted for #one
-    p = DB.read(:people).sort.one
-    expect(p.id).to_not be(nil)
-    expect(p.name).to eq('snusnu')
-    expect(p.account_id).to eql(account.id)
+    p = db.read(:people).sort.one
+    expect(p.id).to eq(person.id)
+    expect(p.name).to eq(person.name)
+    expect(p.account_id).to eq(account.id)
   end
 
   it 'provides access to virtual relations' do
-    account = DB.one(:accounts)
-    person  = DB.one(:people)
-    task    = DB.one(:tasks)
-
-    a = DB.one(:actors, 1)
+    a = db.one(:actors, 1)
     expect(a.id).to eq(person.id)
     expect(a.name).to eq(person.name)
     expect(a.account.id).to eq(account.id)
     expect(a.account.email).to eq(account.email)
 
-    dt = DB.one(:task_details, 1)
+    dt = db.one(:task_details, 1)
     expect(dt.id).to eq(task.id)
     expect(dt.name).to eq(task.name)
     expect(dt.person.id).to eq(person.id)
@@ -211,7 +206,7 @@ describe Ramom do
     expect(dt.person.account.id).to eql(account.id)
     expect(dt.person.account.email).to eql(account.email)
 
-    dp = DB.one(:person_details, 1)
+    dp = db.one(:person_details, 1)
     expect(dp.id).to eq(person.id)
     expect(dp.name).to eq(person.name)
     expect(dp.account.id).to eq(account.id)
@@ -221,13 +216,13 @@ describe Ramom do
     expect(t.id).to eq(task.id)
     expect(t.name).to eq(task.name)
 
-    tuple  = DB.schema.actors(1).sort.one
-    mapper = DB.mapping[:actors]
+    tuple  = db.schema.actors(1).sort.one
+    mapper = db.mapping[:actors]
 
     expect(mapper.load(tuple)).to eql(a)
 
     expect {
-      DB.schema.task_actors(1).one
+      db.schema.task_actors(1).one
     }.to raise_error(NoMethodError)
   end
 end

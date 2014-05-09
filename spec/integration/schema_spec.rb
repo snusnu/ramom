@@ -92,58 +92,58 @@ describe Ramom do
   entity_registry = Ramom::Entity::Definition::Registry.build(guard: false) do
 
     register :account do
-      map :id,    :Integer, from: :account_id
-      map :email, :String,  from: :account_email
+      map :id,    from: :account_id
+      map :email, from: :account_email
     end
 
     register :person do
-      map :id,         :Integer, from: :person_id
-      map :account_id, :Integer, from: :account_id
-      map :name,       :String,  from: :person_name
+      map :id,         from: :person_id
+      map :account_id, from: :account_id
+      map :name,       from: :person_name
     end
 
     register :task do
-      map :id,   :Integer, from: :task_id
-      map :name, :String,  from: :task_name
+      map :id,   from: :task_id
+      map :name, from: :task_name
     end
 
     register :detailed_person do
-      map :id,         :Integer, from: :person_id
-      map :name,       :String,  from: :person_name
+      map :id,   from: :person_id
+      map :name, from: :person_name
 
       wrap :account, entity: :'detailed_person.account' do
-        map :id,    :Integer, from: :account_id
-        map :email, :String,  from: :account_email
+        map :id,    from: :account_id
+        map :email, from: :account_email
       end
 
       group :tasks, entity: :'detailed_person.task' do
-        map :id,   :Integer, from: :task_id
-        map :name, :String,  from: :task_name
+        map :id,   from: :task_id
+        map :name, from: :task_name
       end
     end
 
     register :detailed_task do
-      map :id,         :Integer, from: :task_id
-      map :name,       :String,  from: :task_name
+      map :id,   from: :task_id
+      map :name, from: :task_name
 
       wrap :person, entity: :'task.person' do
-        map :id,   :Integer, from: :person_id
-        map :name, :String,  from: :person_name
+        map :id,   from: :person_id
+        map :name, from: :person_name
 
         wrap :account, entity: :'task.person.account' do
-          map :id,    :Integer, from: :account_id
-          map :email, :String,  from: :account_email
+          map :id,    from: :account_id
+          map :email, from: :account_email
         end
       end
     end
 
     register :actor do
-      map :id,         :Integer, from: :person_id
-      map :name,       :String,  from: :person_name
+      map :id,   from: :person_id
+      map :name, from: :person_name
 
       wrap :account, entity: :'actor.account' do
-        map :id,       :Integer, from: :account_id
-        map :email,    :String,  from: :account_email
+        map :id,    from: :account_id
+        map :email, from: :account_email
       end
     end
 
@@ -181,14 +181,8 @@ describe Ramom do
     expect(person.name).to eq('snusnu')
     expect(person.account_id).to eql(account.id)
 
-    a = db.read(:accounts).sort.one
-    expect(a.id).to eq(account.id)
-    expect(a.email).to eq(account.email)
-
-    p = db.read(:people).sort.one
-    expect(p.id).to eq(person.id)
-    expect(p.name).to eq(person.name)
-    expect(p.account_id).to eq(account.id)
+    expect(db.read(:accounts).sort.one).to eql(account)
+    expect(db.read(:people).sort.one).to eql(person)
   end
 
   it 'provides access to virtual relations' do

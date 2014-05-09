@@ -17,7 +17,7 @@ module Ramom
         end
 
         def processor
-          options.fetch(:processor)
+          options.fetch(:processor, :Noop)
         end
         memoize :processor
 

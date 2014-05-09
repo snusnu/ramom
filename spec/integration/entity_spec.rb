@@ -3,7 +3,7 @@
 require 'pp'
 require 'rspec'
 
-require 'ramom/entity'
+require 'ramom'
 
 describe 'entity mapping' do
 
@@ -27,6 +27,11 @@ describe 'entity mapping' do
     # (2) Define a new registry of entity definitions
 
     registry = Ramom::Entity::Definition::Registry.build(key: :symbolize) do
+
+      register(:company) do
+        map :id
+        map :name
+      end
 
       register(:contact) do
         map :email, :String, from: :email_address
@@ -87,6 +92,24 @@ describe 'entity mapping' do
 
       puts "\n-------- WORKING WITH MORPHERS ----------\n\n"
 
+    end
+
+    # Test untyped mapping with no options
+    morpher = environment.hash_transformer { map :id }
+
+    begin
+      expect(morpher.call(id: 1)[:id]).to be(1)
+    rescue Ramom::Entity::Morpher::TransformError => e
+      puts e.message
+    end
+
+    # Test untyped mapping with options
+    morpher = environment.hash_transformer { map :id, key: :symbolize }
+
+    begin
+      expect(morpher.call('id' => 1)[:id]).to be(1)
+    rescue Ramom::Entity::Morpher::TransformError => e
+      puts e.message
     end
 
     # Some use cases don't require the need to perform

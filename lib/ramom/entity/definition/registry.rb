@@ -12,7 +12,11 @@ module Ramom
           end
         end # AlreadyRegistered
 
-        DEFAULT_OPTIONS = { key: :neutral, guard: Hash }.freeze
+        DEFAULT_OPTIONS = {
+          key:            :neutral,
+          guard:          Hash,
+          name_generator: ->(entity_name, attribute_name) { attribute_name }
+        }.freeze
 
         include Lupo.enumerable(:entries)
 
@@ -22,7 +26,7 @@ module Ramom
         private     :entries
 
         def self.build(default_options = DEFAULT_OPTIONS, entries = EMPTY_HASH, &block)
-          instance = new(default_options, entries)
+          instance = new(DEFAULT_OPTIONS.merge(default_options), entries)
           instance.instance_eval(&block) if block
           instance
         end

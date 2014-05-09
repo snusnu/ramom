@@ -21,7 +21,12 @@ module Ramom
       end
 
       def map(name, *args)
-        header << Attribute::Primitive.build(name, default_options, args)
+        header << Attribute::Primitive.build(
+          name:            name,
+          entity_name:     entity_name,
+          default_options: default_options,
+          args:            args
+        )
       end
 
       def wrap(name, options = EMPTY_HASH, &block)

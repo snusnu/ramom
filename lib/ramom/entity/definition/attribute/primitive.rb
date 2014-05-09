@@ -25,17 +25,23 @@ module Ramom
               end
             end # InternalError
 
-            include Equalizer.new(:args)
             include Procto.call
+            include Anima.new(
+              :name,
+              :entity_name,
+              :default_options,
+              :args
+            )
 
             NULL_PROCESSOR = { processor: :Noop }
 
             attr_reader :args
             protected   :args
 
-            def initialize(default_options, args)
-              @default_options, @args = default_options, args
+            def initialize(configuration)
+              super
 
+              @name_generator       = default_options.fetch(:name_generator)
               @default_primitive    = default_primitive?
               @configured_primitive = configured_primitive?
               @referenced_processor = referenced_processor?
@@ -48,7 +54,10 @@ module Ramom
             end
 
             def call
-              @default_options.merge(options)
+              @default_options.
+                reject { |k,_| k == :name_generator }.
+                merge!(from: from_name).
+                merge!(options)
             end
 
             private
@@ -85,6 +94,10 @@ module Ramom
               args.length == 2 && args.first.is_a?(Symbol) && args.last.is_a?(Hash)
             end
 
+            def from_name
+              @name_generator.call(entity_name, name)
+            end
+
             def options
               if @default_primitive
                 NULL_PROCESSOR
@@ -100,8 +113,8 @@ module Ramom
             end
           end # OptionBuilder
 
-          def self.build(name, default_options, args)
-            new(name, OptionBuilder.call(default_options, args))
+          def self.build(configuration)
+            new(configuration.fetch(:name), OptionBuilder.call(configuration))
           end
 
           def primitive?

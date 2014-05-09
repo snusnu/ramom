@@ -26,14 +26,15 @@ describe Ramom do
     include DataMapper::Resource
 
     property :id,    Serial
-    property :email, String
+    property :email, String, unique: true
   end
 
   class Person
     include DataMapper::Resource
 
     property :id,         Serial
-    property :name,       String
+    property :name,       String, unique_index: :test_compound_index
+    property :nickname,   String, unique_index: :test_compound_index
     property :account_id, Integer, field: 'account_id'
 
     belongs_to :account
@@ -53,9 +54,10 @@ describe Ramom do
   DataMapper.finalize.auto_migrate!
 
   Person.create(
-    name:    'snusnu',
-    account: { email: 'test@test.com' },
-    tasks:   [{name: 'test'}]
+    name:     'snusnu',
+    nickname: 'gams',
+    account:  { email: 'test@test.com' },
+    tasks:    [{name: 'test'}]
   )
 
   # (2) Initialize a new Ramom::Schema

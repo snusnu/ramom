@@ -25,23 +25,16 @@ module Ramom
               end
             end # InternalError
 
+            include Concord.new(:name, :default_options, :args)
             include Procto.call
-            include Anima.new(
-              :name,
-              :entity_name,
-              :default_options,
-              :args
-            )
 
             NULL_PROCESSOR = { processor: :Noop }
 
-            attr_reader :args
-            protected   :args
-
-            def initialize(configuration)
+            def initialize(name, default_options, args)
               super
 
               @name_generator       = default_options.fetch(:name_generator)
+              @base_name            = default_options.fetch(:base)
               @default_primitive    = default_primitive?
               @configured_primitive = configured_primitive?
               @referenced_processor = referenced_processor?
@@ -95,7 +88,7 @@ module Ramom
             end
 
             def from_name
-              @name_generator.call(entity_name, name)
+              @name_generator.call(@base_name, name)
             end
 
             def options
@@ -113,8 +106,8 @@ module Ramom
             end
           end # OptionBuilder
 
-          def self.build(configuration)
-            new(configuration.fetch(:name), OptionBuilder.call(configuration))
+          def self.build(name, default_options, args)
+            new(name, OptionBuilder.call(name, default_options, args))
           end
 
           def primitive?

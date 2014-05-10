@@ -48,6 +48,10 @@ module Ramom
           entries.fetch(name)
         end
 
+        def include?(name)
+          entries.key?(name)
+        end
+
         def models(builder_name)
           Model::Builder.call(builder_name, self)
         end

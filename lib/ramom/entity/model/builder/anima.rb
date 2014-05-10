@@ -28,9 +28,13 @@ module Ramom
           end
 
           def processor(definition)
-            s(:load_attribute_hash, s(:param, registry.fetch(definition.entity_name) {
-              model(definition)
-            }))
+            s(:load_attribute_hash, s(:param, param(definition)))
+          end
+
+          private
+
+          def param(definition)
+            registry.fetch(definition.entity_name) { model(definition) }
           end
 
         end # Anima

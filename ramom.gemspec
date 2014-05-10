@@ -24,6 +24,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'morpher',          '~> 0.2.3'
   gem.add_dependency 'adamantium',       '~> 0.2.0'
   gem.add_dependency 'abstract_type',    '~> 0.0.7'
+  gem.add_dependency 'inflecto',         '~> 0.0.2'
   gem.add_dependency 'axiom',            '~> 0.2.0'
   gem.add_dependency 'axiom-do-adapter', '~> 0.2.0'
   gem.add_dependency 'axiom-types',      '~> 0.1.1'

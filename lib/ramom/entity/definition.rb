@@ -11,7 +11,7 @@ module Ramom
       public :default_options
 
       def self.build(entity_name, default_options = EMPTY_HASH, header = EMPTY_ARRAY, &block)
-        instance = new(entity_name, default_options, header)
+        instance = new(entity_name, {base: entity_name}.merge(default_options), header)
         instance.instance_eval(&block) if block
         instance
       end
@@ -21,12 +21,7 @@ module Ramom
       end
 
       def map(name, *args)
-        header << Attribute::Primitive.build(
-          name:            name,
-          entity_name:     entity_name,
-          default_options: default_options,
-          args:            args
-        )
+        header << Attribute::Primitive.build(name, default_options, args)
       end
 
       def wrap(name, options = EMPTY_HASH, &block)

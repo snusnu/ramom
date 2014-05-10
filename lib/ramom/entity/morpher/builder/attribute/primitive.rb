@@ -7,11 +7,10 @@ module Ramom
         class Attribute
 
           class Primitive < self
-
             private
 
             def node
-              environment.processor(attribute.processor, attribute.options)
+              environment.processor(processor, options)
             end
           end # Primitive
         end # Attribute

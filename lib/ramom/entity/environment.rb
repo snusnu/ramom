@@ -61,16 +61,16 @@ module Ramom
         self
       end
 
-      def hash_transformer(entity_name = :anonymous, default_options = EMPTY_HASH, &block)
-        Morpher.hash_transformer(definition(entity_name, default_options, &block), self)
+      def hash_transformer(name = :anonymous, default_options = {base: name}, &block)
+        Morpher.hash_transformer(definition(name, default_options, &block), self)
       end
 
-      def object_mapper(entity_name = :anonymous, default_options = EMPTY_HASH, &block)
-        Morpher.object_mapper(definition(entity_name, default_options, &block), self)
+      def object_mapper(name = :anonymous, default_options = {base: name}, &block)
+        Morpher.object_mapper(definition(name, default_options, &block), self)
       end
 
-      def mapper(entity_name)
-        Mapper.build(definitions[entity_name], self)
+      def mapper(name)
+        Mapper.build(definitions[name], self)
       end
 
       def processor(name, options)
@@ -92,6 +92,8 @@ module Ramom
       private
 
       def definition(entity_name, default_options, &block)
+        return definitions[entity_name] if definitions.include?(entity_name)
+
         options = definitions.default_options.merge(default_options)
         Definition.build(entity_name, options, &block)
       end

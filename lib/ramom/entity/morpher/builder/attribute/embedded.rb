@@ -17,14 +17,14 @@ module Ramom
               klass.new(attribute, *args)
             end
 
-            attr_reader :entity_name
-
             def initialize(attribute, *args)
               super
               @entity_name = attribute.entity_name
             end
 
             private
+
+            attr_reader :entity_name
 
             def node
               Builder::Entity.call(builder, definition, environment)
@@ -35,7 +35,7 @@ module Ramom
               def definition
                 Ramom::Entity::Definition.build(
                   entity_name,
-                  default_options,
+                  options,
                   &attribute.block
                 )
               end
@@ -80,4 +80,3 @@ module Ramom
     end # Morpher
   end # Entity
 end # Ramom
-

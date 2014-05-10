@@ -91,72 +91,81 @@ describe Ramom do
 
   # (3) Define domain DTOs
 
-  entity_registry = Ramom::Entity::Definition::Registry.build(guard: false) do
+  fk_constraints  = { # TODO provide Schema API to infer this structure
+    person: [:account_id]
+  }
+
+  default_options = {
+    guard:          false,
+    name_generator: Ramom::Schema::Mapping::NaturalJoin.new(fk_constraints)
+  }
+
+  definition_registry = Ramom::Entity::Definition::Registry.build(default_options) do
 
     register :account do
-      map :id,    from: :account_id
-      map :email, from: :account_email
+      map :id
+      map :email
     end
 
     register :person do
-      map :id,         from: :person_id
-      map :account_id, from: :account_id
-      map :name,       from: :person_name
+      map :id
+      map :account_id
+      map :name
     end
 
     register :task do
-      map :id,   from: :task_id
-      map :name, from: :task_name
+      map :id
+      map :name
     end
 
-    register :detailed_person do
-      map :id,   from: :person_id
-      map :name, from: :person_name
+    register :detailed_person, base: :person do
+      map :id
+      map :name
 
       wrap :account, entity: :'detailed_person.account' do
-        map :id,    from: :account_id
-        map :email, from: :account_email
+        map :id
+        map :email
       end
 
       group :tasks, entity: :'detailed_person.task' do
-        map :id,   from: :task_id
-        map :name, from: :task_name
+        map :id
+        map :name
       end
     end
 
-    register :detailed_task do
-      map :id,   from: :task_id
-      map :name, from: :task_name
+    register :detailed_task, base: :task do
+      map :id
+      map :name
 
       wrap :person, entity: :'task.person' do
-        map :id,   from: :person_id
-        map :name, from: :person_name
+        map :id
+        map :name
 
         wrap :account, entity: :'task.person.account' do
-          map :id,    from: :account_id
-          map :email, from: :account_email
+          map :id
+          map :email
         end
       end
     end
 
-    register :actor do
-      map :id,   from: :person_id
-      map :name, from: :person_name
+    register :actor, base: :person do
+      map :id
+      map :name
 
       wrap :account, entity: :'actor.account' do
-        map :id,    from: :account_id
-        map :email, from: :account_email
+        map :id
+        map :email
       end
     end
 
   end
 
-  models   = entity_registry.models(:anima)
-  entities = entity_registry.environment(models)
+  models             = definition_registry.models(:anima)
+  entity_environment = definition_registry.environment(models)
 
   # (4) Connect schema relations with DTO mappers
 
-  mapping = Ramom::Mapping.new(entities) do
+  mapping = Ramom::Mapping.new(entity_environment) do
     map :accounts,       :account
     map :people,         :person
     map :tasks,          :task

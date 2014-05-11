@@ -122,12 +122,12 @@ describe Ramom do
       map :id
       map :name
 
-      wrap :account, entity: :'detailed_person.account' do
+      wrap :account do
         map :id
         map :email
       end
 
-      group :tasks, entity: :'detailed_person.task' do
+      group :tasks do
         map :id
         map :name
       end
@@ -137,11 +137,11 @@ describe Ramom do
       map :id
       map :name
 
-      wrap :person, entity: :'task.person' do
+      wrap :person do
         map :id
         map :name
 
-        wrap :account, entity: :'task.person.account' do
+        wrap :account do
           map :id
           map :email
         end
@@ -152,7 +152,7 @@ describe Ramom do
       map :id
       map :name
 
-      wrap :account, entity: :'actor.account' do
+      wrap :account do
         map :id
         map :email
       end

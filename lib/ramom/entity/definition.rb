@@ -25,11 +25,21 @@ module Ramom
       end
 
       def wrap(name, options = EMPTY_HASH, &block)
-        header << Attribute::Entity.build(name, options, default_options, block)
+        header << Attribute::Entity.build(
+          name,
+          wrap_options(name, options),
+          default_options,
+          block
+        )
       end
 
       def group(name, options = EMPTY_HASH, &block)
-        header << Attribute::Collection.build(name, options, default_options, block)
+        header << Attribute::Collection.build(
+          name,
+          group_options(name, options),
+          default_options,
+          block
+        )
       end
 
       def attribute_nodes(environment, builder)
@@ -46,6 +56,16 @@ module Ramom
             hash[attribute.old_key] = attribute.default_value
           end
         }
+      end
+
+      private
+
+      def wrap_options(name, options)
+        options.merge(entity: :"#{entity_name}.#{name}")
+      end
+
+      def group_options(name, options)
+        options.merge(entity: :"#{entity_name}.#{Inflecto.singularize(name.to_s)}")
       end
 
     end # Definition

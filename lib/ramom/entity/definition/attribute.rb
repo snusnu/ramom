@@ -12,6 +12,10 @@ module Ramom
 
         abstract_method :builder
 
+        def initialize(name, options)
+          super(name.to_sym, options)
+        end
+
         def node(environment, entity_builder_name)
           builder.call(self, environment, entity_builder_name)
         end

@@ -26,7 +26,6 @@ module Ramom
 
         class Entity < self
 
-          attr_reader :entity_name
           attr_reader :block
 
           def self.build(name, options, default_options, block)
@@ -35,7 +34,6 @@ module Ramom
 
           def initialize(name, options, block)
             super(name, options)
-            @entity_name = options.fetch(:entity, name)
             @block       = block
           end
 
@@ -43,7 +41,15 @@ module Ramom
             !!block
           end
 
+          def entity_name
+            embed? ? options.fetch(:entity, name) : referenced_name
+          end
+
           private
+
+          def referenced_name
+            name
+          end
 
           def builder
             Morpher::Builder::Attribute::Entity
@@ -60,6 +66,10 @@ module Ramom
           end
 
           private
+
+          def referenced_name
+            Inflecto.singularize(name.to_s).to_sym
+          end
 
           def builder
             Morpher::Builder::Attribute::Collection

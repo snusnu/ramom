@@ -13,8 +13,8 @@ module Ramom
         end # AlreadyRegistered
 
         DEFAULT_OPTIONS = {
-          key:            :neutral,
           guard:          Hash,
+          key_transform: :neutral,
           name_generator: ->(entity_name, attribute_name) { attribute_name }
         }.freeze
 

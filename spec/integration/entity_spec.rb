@@ -26,7 +26,8 @@ describe 'entity mapping' do
 
     # (2) Define a new registry of entity definitions
 
-    registry = Ramom::Entity::Definition::Registry.build(key: :symbolize) do
+    options  = {key_transform: :symbolize}
+    registry = Ramom::Entity::Definition::Registry.build(options) do
 
       register(:contact) do
         map :email, :String, from: :email_address
@@ -99,10 +100,10 @@ describe 'entity mapping' do
     end
 
     # Test untyped mapping with options
-    morpher = environment.hash_transformer { map :id, key: :symbolize }
+    morpher = environment.hash_transformer { map :id, from: 'ID' }
 
     begin
-      expect(morpher.call('id' => 1)[:id]).to be(1)
+      expect(morpher.call('ID' => 1)[:id]).to be(1)
     rescue Ramom::Entity::Morpher::TransformError => e
       puts e.message
     end
@@ -121,7 +122,7 @@ describe 'entity mapping' do
     # a hash after working with it.
 
     morpher = environment.hash_transformer do
-      map :page, :ParsedInt10, default: '1', key: :symbolize
+      map :page, :ParsedInt10, default: '1'
     end
 
     begin
@@ -150,7 +151,7 @@ describe 'entity mapping' do
     end
 
     morpher = environment.object_mapper(:page) do
-      map :page, :ParsedInt10, default: '1', key: :symbolize
+      map :page, :ParsedInt10, default: '1'
     end
 
     begin

@@ -35,7 +35,7 @@ module Ramom
         end
 
         def old_key
-          case options[:key]
+          case options[:key_transform]
           when :neutral
             fetch_old_key(name)
           when :symbolize
@@ -46,7 +46,7 @@ module Ramom
         end
 
         def new_key
-          case options[:key]
+          case options[:key_transform]
           when :neutral
             name
           when :symbolize

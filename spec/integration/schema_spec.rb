@@ -12,6 +12,8 @@ require 'ramom'
 require 'ramom/relation/builder/dm'
 require 'ramom/schema/definition/builder/dm'
 
+require 'mom'
+
 describe Ramom do
 
   # (1) Setup and define tables with DataMapper
@@ -100,7 +102,7 @@ describe Ramom do
     name_generator: Ramom::Schema::Mapping::NaturalJoin.new(fk_constraints)
   }
 
-  definition_registry = Ramom::Entity::Definition::Registry.build(default_options) do
+  definition_registry = Mom::Definition::Registry.build(default_options) do
 
     register :account do
       map :id

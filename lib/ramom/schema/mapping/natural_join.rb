@@ -4,7 +4,7 @@ module Ramom
   class Schema
     class Mapping
         class NaturalJoin
-          include Concord.new(:exclusions)
+          include Concord.new(:foreign_keys)
 
           def call(base_name, attribute_name)
             if exclude?(base_name, attribute_name)
@@ -17,8 +17,8 @@ module Ramom
           private
 
           def exclude?(base_name, attribute_name)
-            if prefix = exclusions.fetch(base_name, false)
-              prefix.include?(attribute_name)
+            if f_keys = foreign_keys.fetch(base_name, false)
+              f_keys.include?(attribute_name)
             else
               false
             end

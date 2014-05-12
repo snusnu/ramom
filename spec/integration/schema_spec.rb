@@ -69,6 +69,9 @@ describe Ramom do
 
   schema_definition = Ramom::Schema.define(base_relations) do
 
+    fk_constraint :people, :accounts, account_id: :id
+    fk_constraint :tasks,  :people,   person_id:  :id
+
     external :actors do |account_id|
       people.
         join(accounts.restrict(account_id: account_id)).
@@ -93,13 +96,11 @@ describe Ramom do
 
   # (3) Define domain DTOs
 
-  fk_constraints  = { # TODO provide Schema API to infer this structure
-    person: [:account_id]
-  }
+  foreign_keys = schema_definition.foreign_keys
 
   default_options = {
     guard:          false,
-    name_generator: Ramom::Schema::Mapping::NaturalJoin.new(fk_constraints)
+    name_generator: Ramom::Schema::Mapping::NaturalJoin.new(foreign_keys)
   }
 
   definition_registry = Mom::Definition::Registry.build(default_options) do

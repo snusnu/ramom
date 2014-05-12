@@ -11,10 +11,22 @@ module Ramom
             include Concord::Public.new(:name, :visibility, :body)
           end # Future
 
-          include Concord::Public.new(:base, :virtual)
+          class FKConstraint
+            include Concord::Public.new(:source, :target, :mapping)
 
-          def self.call(base = EMPTY_HASH, virtual = EMPTY_HASH, &block)
-            new(base.dup, virtual.dup).call(&block)
+            def source_attributes
+              mapping.keys
+            end
+
+            def target_attributes
+              mapping.values
+            end
+          end # FKConstraint
+
+          include Concord::Public.new(:base, :virtual, :fk_constraints)
+
+          def self.call(base = EMPTY_HASH, virtual = EMPTY_HASH, fk_constraints = EMPTY_HASH, &block)
+            new(base.dup, virtual.dup, fk_constraints.dup).call(&block)
           end
 
           def call(&block)
@@ -26,6 +38,10 @@ module Ramom
 
           def base_relation(name, &block)
             raise NotImplementedError
+          end
+
+          def fk_constraint(source, target, mapping)
+            fk_constraints[source] = FKConstraint.new(source, target, mapping)
           end
 
           def internal(name, &block)
@@ -41,12 +57,11 @@ module Ramom
           end
         end # Context
 
-        include Adamantium::Flat
-        include Concord.new(:base, :virtual, :block)
+        include Anima.new(:base, :virtual, :fk_constraints, :block)
         include Procto.call
 
         def call
-          Definition.new(Context.call(base, virtual, &block))
+          Definition.new(Context.call(base, virtual, fk_constraints, &block))
         end
       end # Builder
     end # Definition

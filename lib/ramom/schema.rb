@@ -17,8 +17,13 @@ module Ramom
       end
     end # Builder
 
-    def self.define(base_relations, virtual_relations = EMPTY_HASH, &block)
-      Definition::Builder.call(base_relations, virtual_relations, block)
+    def self.define(base, virtual = EMPTY_HASH, fk_constraints = EMPTY_HASH, &block)
+      Definition::Builder.call(
+        base:           base,
+        virtual:        virtual,
+        fk_constraints: fk_constraints,
+        block:          block
+      )
     end
 
     def self.build(*args)

@@ -121,7 +121,7 @@ describe Ramom do
       map :name
     end
 
-    register :detailed_person, base: :person do
+    register :detailed_person, prefix: :person do
       map :id
       map :name
 
@@ -136,7 +136,7 @@ describe Ramom do
       end
     end
 
-    register :detailed_task, base: :task do
+    register :detailed_task, prefix: :task do
       map :id
       map :name
 
@@ -151,7 +151,7 @@ describe Ramom do
       end
     end
 
-    register :actor, base: :person do
+    register :actor, prefix: :person do
       map :id
       map :name
 

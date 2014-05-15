@@ -11,22 +11,10 @@ module Ramom
             include Concord::Public.new(:name, :visibility, :body)
           end # Future
 
-          class FKConstraint
-            include Concord::Public.new(:source, :target, :mapping)
+          include Concord::Public.new(:base, :fk_constraints, :virtual)
 
-            def source_attributes
-              mapping.keys
-            end
-
-            def target_attributes
-              mapping.values
-            end
-          end # FKConstraint
-
-          include Concord::Public.new(:base, :virtual, :fk_constraints)
-
-          def self.call(base = EMPTY_HASH, virtual = EMPTY_HASH, fk_constraints = EMPTY_HASH, &block)
-            new(base.dup, virtual.dup, fk_constraints.dup).call(&block)
+          def self.call(base = EMPTY_HASH, fk_constraints = FK_C_HASH, virtual = EMPTY_HASH, &block)
+            new(base.dup, fk_constraints.dup, virtual.dup).call(&block)
           end
 
           def call(&block)
@@ -41,7 +29,7 @@ module Ramom
           end
 
           def fk_constraint(source, target, mapping)
-            fk_constraints[source] = FKConstraint.new(source, target, mapping)
+            fk_constraints[source] << FKConstraint.new(source, target, mapping)
           end
 
           def internal(name, &block)
@@ -57,11 +45,11 @@ module Ramom
           end
         end # Context
 
-        include Anima.new(:base, :virtual, :fk_constraints, :block)
+        include Anima.new(:base, :fk_constraints, :virtual, :block)
         include Procto.call
 
         def call
-          Definition.new(Context.call(base, virtual, fk_constraints, &block))
+          Definition.new(Context.call(base, fk_constraints, virtual, &block))
         end
       end # Builder
     end # Definition

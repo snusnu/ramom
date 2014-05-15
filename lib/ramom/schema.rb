@@ -17,7 +17,7 @@ module Ramom
       end
     end # Builder
 
-    def self.define(base, virtual = EMPTY_HASH, fk_constraints = EMPTY_HASH, &block)
+    def self.define(base, fk_constraints = FK_C_HASH, virtual = EMPTY_HASH, &block)
       Definition::Builder.call(
         base:           base,
         virtual:        virtual,

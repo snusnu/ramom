@@ -18,7 +18,7 @@ module Ramom
 
           def exclude?(base_name, attribute_name)
             if f_keys = foreign_keys.fetch(base_name, false)
-              f_keys.include?(attribute_name)
+              f_keys.any? { |attributes| attributes.include?(attribute_name) }
             else
               false
             end

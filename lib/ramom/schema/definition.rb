@@ -17,9 +17,9 @@ module Ramom
       end
 
       def foreign_keys
-        fk_constraints.each_with_object({}) { |(rel_name, fk_c), keys|
+        fk_constraints.each_with_object(FK_C_HASH.dup) { |(rel_name, f_keys), hash|
           tuple_name = Inflecto.singularize(rel_name.to_s).to_sym
-          keys[tuple_name] = fk_c.source_attributes
+          f_keys.each { |fk| hash[tuple_name] << fk.source_attributes }
         }
       end
     end # Definition

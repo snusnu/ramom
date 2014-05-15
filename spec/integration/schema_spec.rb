@@ -64,13 +64,17 @@ describe Ramom do
 
   # (2) Initialize a new Ramom::Schema
 
-  models          = DataMapper::Model.descendants
-  base_relations  = Ramom::Schema::Definition::Builder::DM.call(models)
+  models        = DataMapper::Model.descendants
+  dm_definition = Ramom::Schema::Definition::Builder::DM.call(models)
 
-  schema_definition = Ramom::Schema.define(base_relations) do
+  base_relations = dm_definition[:base_relations]
+  fk_constraints = dm_definition[:fk_constraints]
 
-    fk_constraint :people, :accounts, account_id: :id
-    fk_constraint :tasks,  :people,   person_id:  :id
+  schema_definition = Ramom::Schema.define(base_relations, fk_constraints) do
+
+    # These have been inferred from DM1 models
+    # fk_constraint :people, :accounts, account_id: :account_id
+    # fk_constraint :tasks,  :people,   person_id:  :person_id
 
     external :actors do |account_id|
       people.

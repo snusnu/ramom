@@ -125,7 +125,7 @@ describe Ramom do
       map :name
     end
 
-    register :detailed_person, prefix: :person do
+    register :detailed_person, relation: :person_details, prefix: :person do
       map :id
       map :name
 
@@ -140,7 +140,7 @@ describe Ramom do
       end
     end
 
-    register :detailed_task, prefix: :task do
+    register :detailed_task, relation: :task_details, prefix: :task do
       map :id
       map :name
 
@@ -172,14 +172,15 @@ describe Ramom do
 
   # (4) Connect schema relations with DTO mappers
 
-  mapping = Ramom::Mapping.new(entity_environment) do
-    map :accounts,       :account
-    map :people,         :person
-    map :tasks,          :task
-    map :person_details, :detailed_person
-    map :task_details,   :detailed_task
-    map :actors,         :actor
-  end
+  # The commented mappings are inferred automatically
+  mapping = Ramom::Mapping.new(entity_environment) # do
+  #  map :accounts,       :account
+  #  map :people,         :person
+  #  map :tasks,          :task
+  #  map :person_details, :detailed_person
+  #  map :task_details,   :detailed_task
+  #  map :actors,         :actor
+  #end
 
   # (5) Connect the relation schema to a database
 

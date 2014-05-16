@@ -8,7 +8,8 @@ module Ramom
 
     def initialize(entity_registry, entries = EMPTY_HASH, &block)
       super(entity_registry, entries.dup)
-      instance_eval(&block)
+      infer_from_definitions
+      instance_eval(&block) if block
     end
 
     def [](name)
@@ -19,6 +20,16 @@ module Ramom
 
     def map(relation_name, mapper_name)
       entries[relation_name] = entity_registry.mapper(mapper_name)
+    end
+
+    def infer_from_definitions
+      entity_registry.definitions.each do |name, definition|
+        map(definition.default_options.fetch(:relation, pluralize(name)), name)
+      end
+    end
+
+    def pluralize(name)
+      Inflecto.pluralize(name.to_s).to_sym
     end
   end # Mapping
 end # Ramom

@@ -22,11 +22,11 @@ module Ramom
         end
 
         def header
-          properties.map { |p| [p.field, p.primitive, {keys: unique_indexes}] }
+          @properties.map { |p| [p.field, p.primitive, {keys: keys}] }
         end
 
-        def unique_indexes
-          properties.unique_indexes.values
+        def keys
+          @properties.unique_indexes.values
         end
 
       end # DM

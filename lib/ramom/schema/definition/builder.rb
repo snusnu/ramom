@@ -13,7 +13,7 @@ module Ramom
 
           include Concord::Public.new(:base, :fk_constraints, :virtual)
 
-          def self.call(base = EMPTY_HASH, fk_constraints = FK_C_HASH, virtual = EMPTY_HASH, &block)
+          def self.call(base, fk_constraints, virtual, &block)
             new(base.dup, fk_constraints.dup, virtual.dup).call(&block)
           end
 

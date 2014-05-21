@@ -7,10 +7,10 @@ module Ramom
 
         class DM < self
 
-          include Concord.new(:models, :relation_builder)
+          include Concord.new(:models)
           include Procto.call
 
-          def initialize(models, relation_builder = Relation::Builder::DM)
+          def initialize(models)
             super
           end
 
@@ -61,6 +61,10 @@ module Ramom
 
           def key_attributes(key)
             key.map { |property| property.field.to_sym }
+          end
+
+          def relation_builder
+            Relation::Builder::DM
           end
         end # DM
       end # Builder

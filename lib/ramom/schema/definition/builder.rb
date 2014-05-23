@@ -7,9 +7,9 @@ module Ramom
 
         class Context
 
-          class Future
+          class Relation
             include Concord::Public.new(:name, :visibility, :body)
-          end # Future
+          end # Relation
 
           include Concord::Public.new(:base, :fk_constraints, :virtual)
 
@@ -41,7 +41,7 @@ module Ramom
           end
 
           def relation(name, visibility, &block)
-            virtual[name] = Future.new(name, visibility, block)
+            virtual[name] = Relation.new(name, visibility, block)
           end
         end # Context
 

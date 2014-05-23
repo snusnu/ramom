@@ -21,8 +21,7 @@ describe Ramom do
   uri = 'postgres://localhost/test'.freeze
 
   DataMapper.logger = DataMapper::Logger.new($stdout, :debug) if ::ENV['LOG']
-  adapter = DataMapper.setup(:default, uri)
-  adapter.field_naming_convention = DataMapper::NamingConventions::Field::FQN
+  DataMapper.setup(:default, uri)
 
   class Account
     include DataMapper::Resource
@@ -37,7 +36,6 @@ describe Ramom do
     property :id,         Serial
     property :name,       String, unique_index: :test_compound_index
     property :nickname,   String, unique_index: :test_compound_index
-    property :account_id, Integer, field: 'account_id'
 
     belongs_to :account
     has n, :tasks
@@ -48,7 +46,6 @@ describe Ramom do
 
     property :id,        Serial
     property :name,      String
-    property :person_id, Integer, field: 'person_id'
 
     belongs_to :person
   end
@@ -67,10 +64,12 @@ describe Ramom do
   models        = DataMapper::Model.descendants
   dm_definition = Ramom::Schema::Definition::Builder::DM.call(models)
 
-  base_relations = dm_definition[:base_relations]
-  fk_constraints = dm_definition[:fk_constraints]
+  options = {
+    base:           dm_definition[:base_relations],
+    fk_constraints: dm_definition[:fk_constraints]
+  }
 
-  schema_definition = Ramom::Schema.define(base_relations, fk_constraints) do
+  schema_definition = Ramom::Schema.define(options) do
 
     # These have been inferred from DM1 models
     # fk_constraint :people, :accounts, account_id: :account_id
@@ -100,11 +99,11 @@ describe Ramom do
 
   # (3) Define domain DTOs
 
-  foreign_keys = schema_definition.foreign_keys
+  fk_attributes = schema_definition.fk_mapping
 
   default_options = {
     guard:          false,
-    name_generator: Ramom::Schema::Mapping::NaturalJoin.new(foreign_keys)
+    name_generator: Ramom::Schema::Mapping::NaturalJoin.new(fk_attributes)
   }
 
   definition_registry = Mom::Definition::Registry.build(default_options) do

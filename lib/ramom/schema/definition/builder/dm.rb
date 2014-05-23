@@ -12,6 +12,7 @@ module Ramom
 
           def initialize(models)
             super
+            @fk_constraints = FKConstraint::Set.new
           end
 
           def call
@@ -23,36 +24,37 @@ module Ramom
 
           private
 
+          attr_reader :fk_constraints
+
           def base_relations
             models.each_with_object({}) { |model, hash|
-              relation = relation_builder.call(model)
-              hash[relation.name] = relation
+              add_fk_constraints(model)
+
+              fk_attributes  = fk_constraints.source_attributes
+              name_generator = Mapping::NaturalJoin.new(fk_attributes)
+
+              source_name = relation_name(model)
+              relation    = relation_builder.call(model, name_generator)
+              hash[source_name] = relation
             }
           end
 
-          def fk_constraints
-            models.each_with_object(FK_C_HASH.dup) { |model, hash|
-              add_fk_constraints(model, hash)
-            }
-          end
-
-          def add_fk_constraints(model, hash)
+          def add_fk_constraints(model)
             model.relationships.each do |relationship|
               if relationship.respond_to?(:required?) # M:1
-                fk = fk_constraint(relationship)
-                hash[fk.source] << fk
+                add_fk_constraint(relationship)
               end
             end
           end
 
-          def fk_constraint(relationship)
+          def add_fk_constraint(relationship)
             source_name = relation_name(relationship.source_model)
             target_name = relation_name(relationship.target_model)
             source_key  = key_attributes(relationship.source_key)
             target_key  = key_attributes(relationship.target_key)
             mapping     = Hash[source_key.zip(target_key)]
 
-            FKConstraint.new(source_name, target_name, mapping)
+            fk_constraints.add(source_name, target_name, mapping)
           end
 
           def relation_name(model)

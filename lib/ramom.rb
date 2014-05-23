@@ -21,8 +21,8 @@ module Ramom
   # An empty hash useful for (default} parameters
   EMPTY_HASH = {}.freeze
 
-  # An empty frozen hash of arrays needed for FK constraints
-  FK_C_HASH = Hash.new { |h, k| h[k] = [] }.freeze
+  # An empty frozen hash of sets needed for FK constraints
+  FK_C_HASH = Hash.new { |h, k| h[k] = Set.new }.freeze
 
   # An empty frozen string
   EMPTY_STRING = ''.freeze

@@ -17,13 +17,14 @@ module Ramom
       end
     end # Builder
 
-    def self.define(base, fk_constraints = FK_C_HASH, virtual = EMPTY_HASH, &block)
-      Definition::Builder.call(
-        base:           base,
-        virtual:        virtual,
-        fk_constraints: fk_constraints,
-        block:          block
-      )
+    DEFAULT_OPTIONS = {
+      base:           EMPTY_HASH,
+      virtual:        EMPTY_HASH,
+      fk_constraints: Definition::FKConstraint::Set.new
+    }.freeze
+
+    def self.define(options, &block)
+      Definition::Builder.call(DEFAULT_OPTIONS.merge(options).merge!(block: block))
     end
 
     def self.build(*args)

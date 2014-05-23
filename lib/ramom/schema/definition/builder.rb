@@ -14,7 +14,7 @@ module Ramom
           include Concord::Public.new(:base, :fk_constraints, :virtual)
 
           def self.call(base, fk_constraints, virtual, &block)
-            new(base.dup, fk_constraints.dup, virtual.dup).call(&block)
+            new(base.dup, fk_constraints, virtual.dup).call(&block)
           end
 
           def call(&block)
@@ -29,7 +29,7 @@ module Ramom
           end
 
           def fk_constraint(source, target, mapping)
-            fk_constraints[source] << FKConstraint.new(source, target, mapping)
+            fk_constraints.add(source, target, mapping)
           end
 
           def internal(name, &block)

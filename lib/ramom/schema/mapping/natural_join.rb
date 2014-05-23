@@ -4,24 +4,17 @@ module Ramom
   class Schema
     class Mapping
         class NaturalJoin
-          include Concord.new(:foreign_keys)
+          include Concord.new(:fk_attributes)
 
           def call(base_name, attribute_name)
-            if exclude?(base_name, attribute_name)
-              attribute_name
-            else
-              :"#{Inflecto.singularize(base_name)}_#{attribute_name}"
-            end
+            return attribute_name if fk_attribute?(base_name, attribute_name)
+            :"#{Inflecto.singularize(base_name)}_#{attribute_name}"
           end
 
           private
 
-          def exclude?(base_name, attribute_name)
-            if f_keys = foreign_keys.fetch(base_name, false)
-              f_keys.any? { |attributes| attributes.include?(attribute_name) }
-            else
-              false
-            end
+          def fk_attribute?(base_name, attribute_name)
+            fk_attributes.fetch(base_name, EMPTY_ARRAY).include?(attribute_name)
           end
         end # NaturalJoin
     end # Mapping

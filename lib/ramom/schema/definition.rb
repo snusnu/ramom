@@ -8,18 +8,20 @@ module Ramom
       attr_reader :base_relations
       attr_reader :virtual_relations
       attr_reader :fk_constraints
+      attr_reader :fk_attributes
 
-      def initialize(*)
+      def initialize(context)
         super
         @base_relations    = context.base
         @virtual_relations = context.virtual
         @fk_constraints    = context.fk_constraints
+        @fk_attributes     = fk_constraints.source_attributes
       end
 
-      def foreign_keys
-        fk_constraints.each_with_object(FK_C_HASH.dup) { |(rel_name, f_keys), hash|
-          tuple_name = Inflecto.singularize(rel_name.to_s).to_sym
-          f_keys.each { |fk| hash[tuple_name] << fk.source_attributes }
+      # TODO think about a better name (for the natural join strategy)
+      def fk_mapping
+        fk_attributes.each_with_object({}) { |(source_name, attrs), hash|
+          hash[Inflecto.singularize(source_name.to_s).to_sym] = attrs
         }
       end
     end # Definition

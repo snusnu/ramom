@@ -7,12 +7,12 @@ module Ramom
 
         class DM < self
 
-          include Concord.new(:models)
+          include Concord.new(:models, :fk_constraints)
           include Procto.call
 
-          def initialize(models)
+          # This object mutates the injected +fk_constraints+
+          def initialize(models, fk_constraints = FKConstraint::Set.new)
             super
-            @fk_constraints = FKConstraint::Set.new
           end
 
           def call
@@ -23,8 +23,6 @@ module Ramom
           end
 
           private
-
-          attr_reader :fk_constraints
 
           def base_relations
             models.each_with_object({}) { |model, hash|

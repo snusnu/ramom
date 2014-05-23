@@ -20,7 +20,7 @@ module Ramom
     DEFAULT_OPTIONS = {
       base:           EMPTY_HASH,
       virtual:        EMPTY_HASH,
-      fk_constraints: Definition::FKConstraint::Set.new
+      fk_constraints: FKConstraint::Set.new
     }.freeze
 
     def self.define(options, &block)

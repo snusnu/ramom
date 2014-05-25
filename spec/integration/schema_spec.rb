@@ -99,14 +99,9 @@ describe Ramom do
 
   # (3) Define domain DTOs
 
-  fk_attributes = schema_definition.fk_mapping
+  definition_options = Ramom::Schema::Mapping.default_options(schema_definition)
 
-  default_options = {
-    guard:          false,
-    name_generator: Ramom::Schema::Mapping::NaturalJoin.new(fk_attributes)
-  }
-
-  definition_registry = Mom::Definition::Registry.build(default_options) do
+  definition_registry = Mom::Definition::Registry.build(definition_options) do
 
     register :detailed_person, relation: :person_details, prefix: :person do
       map :id

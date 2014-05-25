@@ -108,22 +108,6 @@ describe Ramom do
 
   definition_registry = Mom::Definition::Registry.build(default_options) do
 
-    register :account do
-      map :id
-      map :email
-    end
-
-    register :person do
-      map :id
-      map :account_id
-      map :name
-    end
-
-    register :task do
-      map :id
-      map :name
-    end
-
     register :detailed_person, relation: :person_details, prefix: :person do
       map :id
       map :name
@@ -165,6 +149,17 @@ describe Ramom do
     end
 
   end
+
+  # This mutates +definition_registry+ and adds base relation mappers
+  Ramom::EntityBuilder.call(schema_definition, definition_registry) #, [
+  #
+  # Passing a whitelist of relation names to generate mappers for
+  # is also supported. If no relation names are given, mappers for
+  # all base relations are generated.
+  #
+  #  :people,
+  #  :tasks,
+  #])
 
   models             = definition_registry.models(:anima)
   entity_environment = definition_registry.environment(models)

@@ -8,7 +8,7 @@ module Ramom
 
     def initialize(entity_registry, entries = EMPTY_HASH, &block)
       super(entity_registry, entries.dup)
-      infer_from_definitions
+      infer # done before instance_eval to support overwriting
       instance_eval(&block) if block
     end
 
@@ -22,7 +22,7 @@ module Ramom
       entries[relation_name] = entity_registry.mapper(mapper_name)
     end
 
-    def infer_from_definitions
+    def infer
       entity_registry.definitions.each do |name, definition|
         map(definition.default_options.fetch(:relation, pluralize(name)), name)
       end

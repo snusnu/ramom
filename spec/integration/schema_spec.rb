@@ -148,9 +148,15 @@ describe Ramom do
   # This mutates +definition_registry+ and adds base relation mappers
   Ramom::EntityBuilder.call(schema_definition, definition_registry) #, [
   #
-  # Passing a whitelist of relation names to generate mappers for
-  # is also supported. If no relation names are given, mappers for
-  # all base relations are generated.
+  # Passing a whitelist of base relation names to generate
+  # mappers from is also supported. If no relation names
+  # are given, mappers for all base relations are generated.
+  #
+  # This is useful for automatically generating mappers
+  # that are used for mapping base relation tuples that
+  # get returned from successful write operations. Most
+  # of the time, not all base relations need respective
+  # mappers.
   #
   #  :people,
   #  :tasks,

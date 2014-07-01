@@ -150,7 +150,7 @@ aptly named *objects* when iterating over the tuples returned from the database.
 
 Mappers mainly act as a way to prettify access to the tuple's attributes, so for
 example, in order to be able to call `actor.account.id` instead of `actor[:account_id]`
-you tell `ramom` which mappers to use for you virtual relations.
+you tell `ramom` which mappers to use for your virtual relations.
 
 ```ruby
 definition_options  = Ramom::Schema::Mapping.default_options(schema_definition)

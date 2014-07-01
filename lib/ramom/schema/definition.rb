@@ -5,6 +5,10 @@ module Ramom
     class Definition
       include Concord.new(:context)
 
+      def self.context(base_relations, fk_constraints, virtual = EMPTY_HASH)
+        Builder::Context.new(base_relations, fk_constraints, virtual.dup)
+      end
+
       attr_reader :base_relations
       attr_reader :virtual_relations
       attr_reader :fk_constraints

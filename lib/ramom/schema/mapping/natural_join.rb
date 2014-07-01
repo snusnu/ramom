@@ -4,13 +4,6 @@ module Ramom
   class Schema
     class Mapping
 
-      def self.default_options(schema_definition)
-        {
-          guard:          false,
-          name_generator: NaturalJoin.new(schema_definition.fk_mapping)
-        }
-      end
-
       class NaturalJoin
         include Concord.new(:fk_attributes)
 

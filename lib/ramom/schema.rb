@@ -34,5 +34,9 @@ module Ramom
     def self.coerce(adapter, schema_definition)
       Builder.call(adapter, schema_definition)
     end
+
+    def call(name, *args, &block)
+      send(name, *args, &block)
+    end
   end # Schema
 end # Ramom

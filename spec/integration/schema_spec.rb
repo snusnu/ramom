@@ -69,25 +69,40 @@ end
 
 DataMapper.finalize.auto_migrate!
 
-company    = Company.create(name: 'test')
-person     = Person.create(name: 'snusnu')
-employment = Employment.create(company: company, person: person)
+company_1    = Company.create(name: 'company 1')
+company_2    = Company.create(name: 'company 2')
+person_1     = Person.create(name: 'person 1')
+person_2     = Person.create(name: 'person 2')
+employment_1 = Employment.create(company: company_1, person: person_1)
+employment_2 = Employment.create(company: company_2, person: person_2)
 
 3.times do |i|
   Event.create(
     name:       "event #{i+1}",
     created_at: DateTime.new(2014, 7, i+1),
-    company:    company
+    company:    company_1
   )
 end
+
+Event.create(
+  name:       "event 4",
+  created_at: DateTime.new(2014, 7, 4),
+  company:    company_2
+)
 
 3.times do |i|
   Instruction.create(
     name:       "instruction #{i+1}",
     date:       DateTime.new(2014, 7, i+1),
-    employment: employment
+    employment: employment_1
   )
 end
+
+Instruction.create(
+  name:       "instruction 4",
+  date:       DateTime.new(2014, 7, 4),
+  employment: employment_2
+)
 
 puts
 
@@ -103,11 +118,12 @@ options = {
 
 schema_definition = Ramom::Schema.define(options) do
 
-  external :dashboard do |employment_id|
+  external :dashboard do |company_id, employment_id|
     rel = employee(employment_id).
       join(people).
-      join(page(instructions, [:instruction_date], 1, 2)).
-      join(page(events,       [:event_created_at], 1, 2)).
+      join(companies).
+      join(page(instructions, [:instruction_date], 2, 2)).
+      join(page(events,       [:event_created_at], 2, 2)).
       wrap(person: people.header.map(&:name)).
       group(
         events:       events.header.map(&:name),
@@ -115,13 +131,29 @@ schema_definition = Ramom::Schema.define(options) do
       )
 
     add_page_info(rel, {
-      instructions_page: {number: 1, limit: 2, rel: instructions},
-      events_page:       {number: 1, limit: 2, rel: events},
+      instructions_page: {
+        number: 2,
+        limit:  2,
+        rel: employment_instructions(employment_id)
+      },
+      events_page: {
+        number: 2,
+        limit:  2,
+        rel: company_events(company_id)
+      },
     })
   end
 
   internal :employee do |employment_id|
     employments.restrict(employment_id: employment_id)
+  end
+
+  internal :company_events do |company_id|
+    companies.restrict(company_id: company_id).join(events)
+  end
+
+  internal :employment_instructions do |employment_id|
+    employments.restrict(employment_id: employment_id).join(instructions)
   end
 
 end
@@ -198,7 +230,7 @@ class ShowDashboard < Q
   register :dashboard, dresser: :dashboard
 
   def call(params)
-    one(rel(:dashboard, params[:employment_id]))
+    one(rel(:dashboard, params[:company_id], params[:employment_id]))
   end
 end
 
@@ -213,51 +245,47 @@ describe 'ramom' do
 
   it 'does allow to call external relations directly' do
     expect {
-      schema.dashboard(1)
-    }.to_not raise_error(NoMethodError)
+      schema.dashboard(1, 1)
+    }.to_not raise_error
   end
 
   it 'does not allow to call internal relations directly' do
     expect {
       schema.employee(1)
-    }.to raise_error(NoMethodError)
+    }.to raise_error
   end
 
   it 'supports reading dressed base relations' do
-    person = db.read(:people).one
-
-    expect(person.id).to_not be(nil)
-    expect(person.name).to eq('snusnu')
+    db.read(:people).each_with_index do |person, i|
+      expect(person.id).to_not be(nil)
+      expect(person.name).to eq("person #{i+1}")
+    end
   end
 
   it 'supports reading dressed virtual relations' do
-    d = db.read(:dashboard, employment_id: 1)
+    d = db.read(:dashboard, company_id: 1, employment_id: 1)
 
     expect(d.person.id).to_not be(nil)
-    expect(d.person.name).to eq('snusnu')
+    expect(d.person.name).to eq('person 1')
 
-    expect(d.events_page.number).to be(1)
+    expect(d.events_page.number).to be(2)
     expect(d.events_page.limit).to be(2)
     expect(d.events_page.total).to be(3)
 
-    expect(d.instructions_page.number).to be(1)
+    expect(d.instructions_page.number).to be(2)
     expect(d.instructions_page.limit).to be(2)
     expect(d.instructions_page.total).to be(3)
 
-    expect(d.events.size).to be(2)
+    expect(d.events.size).to be(1)
 
-    d.events.each_with_index do |event, i|
-      expect(event.id).to_not be(nil)
-      expect(event.name).to eq("event #{i+1}")
-      expect(event.created_at).to eq(DateTime.new(2014, 7, i+1))
-    end
+    expect(d.events.first.id).to_not be(nil)
+    expect(d.events.first.name).to eq("event 3")
+    expect(d.events.first.created_at).to eq(DateTime.new(2014, 7, 3))
 
-    expect(d.instructions.size).to be(2)
+    expect(d.instructions.size).to be(1)
 
-    d.instructions.each_with_index do |instruction, i|
-      expect(instruction.id).to_not be(nil)
-      expect(instruction.name).to eq("instruction #{i+1}")
-      expect(instruction.date).to eq(DateTime.new(2014, 7, i+1))
-    end
+    expect(d.instructions.first.id).to_not be(nil)
+    expect(d.instructions.first.name).to eq("instruction 3")
+    expect(d.instructions.first.date).to eq(DateTime.new(2014, 7, 3))
   end
 end

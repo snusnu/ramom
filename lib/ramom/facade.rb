@@ -3,6 +3,11 @@
 module Ramom
 
   class Facade
+
+    def self.build(commands, queries, environment)
+      new(commands.registry, queries.registry, environment)
+    end
+
     include Concord.new(:commands, :queries, :environment)
 
     def read(name, *args, &block)

@@ -209,7 +209,7 @@ database    = Ramom::Database.new(schema, writer)
 environment = Ramom::Operation::Environment.new(database: database)
 
 describe 'ramom' do
-  let(:db) { Ramom::Facade.new(C.registry, Q.registry, environment) }
+  let(:db) { Ramom::Facade.build(C, Q, environment) }
 
   it 'does allow to call external relations directly' do
     expect {

@@ -28,7 +28,7 @@ group :development do
   gem 'dm-core',             git: "#{DM_120}/dm-core.git",             branch: RL_120
   gem 'dm-migrations',       git: "#{DM_120}/dm-migrations.git",       branch: RL_120
   gem 'dm-postgres-adapter', git: "#{DM_120}/dm-postgres-adapter.git", branch: RL_120
-  gem 'mom',                 git: "#{SNUSNU}/mom.git",              branch: MASTER
+  gem 'mom',                 git: "#{SNUSNU}/mom.git",                 branch: MASTER
 end
 
 # added by devtools

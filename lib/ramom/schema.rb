@@ -35,8 +35,49 @@ module Ramom
       Builder.call(adapter, schema_definition)
     end
 
+    # TODO only allow to call external relations
     def call(name, *args, &block)
-      send(name, *args, &block)
+      __send__(name, *args, &block).optimize
+    end
+
+    # Useful relational operators not present in axiom
+
+    def page(relation, order, number, limit)
+      frame(relation, order, number * limit - limit, limit)
+    end
+
+    def frame(relation, order, offset, limit)
+      relation.sort_by(order).drop(offset).take(limit)
+    end
+
+    # Make aggregate functions easily available
+    #
+    def count(relation, attribute_name = nil)
+      Aggregator.new(relation).count(attribute_name)
+    end
+
+    # Helper for pagination UX
+
+    PAGE_DETAILS_ATTRS = [:number, :limit, :total].freeze
+
+    def add_page_info(relation, page_details)
+      page_details.inject(relation) { |rel, (name, details)|
+        rel.extend { |r|
+          r.add(:number, details.fetch(:number))
+          r.add(:limit,  details.fetch(:limit))
+          r.add(:total,  count(details.fetch(:rel)))
+        }.wrap(name => PAGE_DETAILS_ATTRS)
+      }
+    end
+
+    private
+
+    def puts(*args)
+      ::Kernel.puts(*args)
+    end
+
+    def pp(*args)
+      ::Kernel.pp(*args)
     end
   end # Schema
 end # Ramom

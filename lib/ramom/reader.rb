@@ -1,55 +1,25 @@
 # encoding: utf-8
 
 module Ramom
+
   class Reader
+    include Concord::Public.new(:relation, :dresser)
+    include Enumerable
 
-    class Loader
-      include Concord.new(:relation, :mapper)
-      include Enumerable
-
-      def each(&block)
-        return to_enum unless block
-        relation.each { |tuple| yield(mapper.load(tuple)) }
-        self
-      end
-
-      def one(&block)
-        mapper.load(relation.one(&block))
-      end
-
-      def sort
-        new(relation.sort)
-      end
-
-      def sort_by(&block)
-        new(relation.sort_by(&block))
-      end
-
-      private
-
-      def new(new_relation)
-        self.class.new(new_relation, mapper)
-      end
-    end # Loader
-
-    include Concord::Public.new(:schema, :mapping)
-
-    def self.build(adapter, schema_definition, mapping)
-      new(Schema.build(adapter, schema_definition), mapping)
+    def one(&block)
+      dress(relation.one(&block))
     end
 
-    def read(name, *args)
-      Loader.new(relation(name, *args), mapping[name])
-    end
-
-    def one(name, *args, &block)
-      Loader.new(relation(name, *args), mapping[name]).sort.one(&block)
+    def each(&block)
+      return to_enum unless block
+      relation.each { |tuple| yield(dress(tuple)) }
+      self
     end
 
     private
 
-    def relation(name, *args)
-      schema.__send__(name, *args).optimize
+    def dress(tuple)
+      dresser.call(tuple)
     end
   end # Reader
 end # Ramom

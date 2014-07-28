@@ -2,34 +2,29 @@
 
 module Ramom
   class Database
+    include Concord::Public.new(:schema, :writer)
 
-    include Concord.new(:commands, :reader)
-
-    def self.setup(commands, reader, options)
-      new(commands.facade(self, options), reader)
+    def transaction(repository = :default, &block)
+      writer.transaction(repository, &block)
     end
 
-    attr_reader :schema
-
-    def initialize(commands, reader)
-      super
-      @schema = reader.schema
+    def insert(relation, tuples)
+      writer.insert(relation, tuples)
     end
 
-    def one(name, *args, &block)
-      reader.one(name, *args, &block)
+    def update(relation, tuples)
+      writer.update(relation, tuples)
     end
 
-    def read(name, *args)
-      reader.read(name, *args)
+    def delete(relation, tuples)
+      writer.delete(relation, tuples)
     end
 
-    def write(name, *args)
-      commands.call(self, backend, name, *args)
+    def relation(name, *args)
+      schema.call(name, *args)
     end
 
-    def read_relation(name, *args, &block)
-      @schema.call(name, *args, &block)
-    end
+    alias_method :rel, :relation
+
   end # Database
 end # Ramom

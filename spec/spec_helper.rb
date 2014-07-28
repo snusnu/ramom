@@ -23,8 +23,6 @@ require 'ramom'
 # got required by substation
 require 'devtools/spec_helper'
 
-include Ramom
-
 RSpec.configure do |config|
   config.expect_with :rspec do |c|
     c.syntax = :expect

@@ -5,232 +5,259 @@ require 'spec_helper'
 require 'dm-core'
 require 'dm-migrations'
 
-require 'axiom'
-require 'axiom-do-adapter'
+require 'mom'
 
 require 'ramom'
 require 'ramom/relation/builder/dm'
 require 'ramom/schema/definition/builder/dm'
+require 'ramom/writer/dm'
 
-require 'mom'
+require 'axiom-do-adapter'
 
-describe Ramom do
+ENV['TZ'] = 'UTC'     # VERY IMPORTANT
+Axiom::Types.finalize # VERY IMPORTANT
 
-  # (1) Setup and define tables with DataMapper
+# (1) Setup and define tables with DataMapper
 
-  uri = 'postgres://localhost/test'.freeze
+uri = 'postgres://localhost/test'.freeze
 
-  DataMapper.logger = DataMapper::Logger.new($stdout, :debug) if ::ENV['LOG']
-  DataMapper.setup(:default, uri)
+DataMapper.logger = DataMapper::Logger.new($stdout, :debug) if ::ENV['LOG']
+DataMapper.setup(:default, uri)
 
-  class Account
-    include DataMapper::Resource
+class Company
+  include DataMapper::Resource
 
-    property :id,    Serial
-    property :email, String, unique: true
-  end
+  property :id,   Serial
+  property :name, String, required: true
+end
 
-  class Person
-    include DataMapper::Resource
+class Person
+  include DataMapper::Resource
 
-    property :id,         Serial
-    property :name,       String, unique_index: :test_compound_index
-    property :nickname,   String, unique_index: :test_compound_index
+  property :id,   Serial
+  property :name, String, required: true
+end
 
-    belongs_to :account
-    has n, :tasks
-  end
+class Employment
+  include DataMapper::Resource
 
-  class Task
-    include DataMapper::Resource
+  property :id, Serial
 
-    property :id,        Serial
-    property :name,      String
+  belongs_to :company
+  belongs_to :person
+end
 
-    belongs_to :person
-  end
+class Event
+  include DataMapper::Resource
 
-  DataMapper.finalize.auto_migrate!
+  property :id,         Serial
+  property :name,       String, required: true
+  property :created_at, DateTime, required: true
 
-  Person.create(
-    name:     'snusnu',
-    nickname: 'gams',
-    account:  { email: 'test@test.com' },
-    tasks:    [{name: 'test'}]
+  belongs_to :company
+end
+
+class Instruction
+  include DataMapper::Resource
+
+  property :id,   Serial
+  property :name, String, required: true
+  property :date, Date,   required: true
+
+  belongs_to :employment
+end
+
+DataMapper.finalize.auto_migrate!
+
+company    = Company.create(name: 'test')
+person     = Person.create(name: 'snusnu')
+employment = Employment.create(company: company, person: person)
+
+3.times do |i|
+  Event.create(
+    name:       "event #{i+1}",
+    created_at: DateTime.new(2014, 7, i+1),
+    company:    company
   )
+end
 
-  # (2) Initialize a new Ramom::Schema
+3.times do |i|
+  Instruction.create(
+    name:       "instruction #{i+1}",
+    date:       DateTime.new(2014, 7, i+1),
+    employment: employment
+  )
+end
 
-  models        = DataMapper::Model.descendants
-  dm_definition = Ramom::Schema::Definition::Builder::DM.call(models)
+puts
 
-  options = {
-    base:           dm_definition[:base_relations],
-    fk_constraints: dm_definition[:fk_constraints]
-  }
+# (2) Initialize a new Ramom::Schema
 
-  schema_definition = Ramom::Schema.define(options) do
+models        = DataMapper::Model.descendants
+dm_definition = Ramom::Schema::Definition::Builder::DM.call(models)
 
-    # These have been inferred from DM1 models
-    # fk_constraint :people, :accounts, account_id: :account_id
-    # fk_constraint :tasks,  :people,   person_id:  :person_id
+options = {
+  base:           dm_definition[:base_relations],
+  fk_constraints: dm_definition[:fk_constraints]
+}
 
-    external :actors do |account_id|
-      people.
-        join(accounts.restrict(account_id: account_id)).
-        wrap(account: [:account_id, :account_email])
-    end
+schema_definition = Ramom::Schema.define(options) do
 
-    external :person_details do |account_id|
-      task_actors(account_id).
-        group(tasks: [:task_id, :task_name])
-    end
+  external :dashboard do |employment_id|
+    rel = employee(employment_id).
+      join(people).
+      join(page(instructions, [:instruction_date], 1, 2)).
+      join(page(events,       [:event_created_at], 1, 2)).
+      wrap(person: people.header.map(&:name)).
+      group(
+        events:       events.header.map(&:name),
+        instructions: instructions.header.map(&:name),
+      )
 
-    external :task_details do |account_id|
-      task_actors(account_id).
-        wrap(person: [:person_id, :person_name, :account])
-    end
-
-    internal :task_actors do |account_id|
-      tasks.join(actors(account_id))
-    end
-
+    add_page_info(rel, {
+      instructions_page: {number: 1, limit: 2, rel: instructions},
+      events_page:       {number: 1, limit: 2, rel: events},
+    })
   end
 
-  # (3) Define domain DTOs
-
-  definition_options = Ramom::Schema::Mapping.default_options(schema_definition)
-
-  definition_registry = Mom::Definition::Registry.build(definition_options) do
-
-    register :detailed_person, relation: :person_details, prefix: :person do
-      map :id
-      map :name
-
-      wrap :account do
-        map :id
-        map :email
-      end
-
-      group :tasks do
-        map :id
-        map :name
-      end
-    end
-
-    register :detailed_task, relation: :task_details, prefix: :task do
-      map :id
-      map :name
-
-      wrap :person do
-        map :id
-        map :name
-
-        wrap :account do
-          map :id
-          map :email
-        end
-      end
-    end
-
-    register :actor, prefix: :person do
-      map :id
-      map :name
-
-      wrap :account do
-        map :id
-        map :email
-      end
-    end
-
+  internal :employee do |employment_id|
+    employments.restrict(employment_id: employment_id)
   end
 
-  # This mutates +definition_registry+ and adds base relation mappers
-  Ramom::EntityBuilder.call(schema_definition, definition_registry) #, [
-  #
-  # Passing a whitelist of base relation names to generate
-  # mappers from is also supported. If no relation names
-  # are given, mappers for all base relations are generated.
-  #
-  # This is useful for automatically generating mappers
-  # that are used for mapping base relation tuples that
-  # get returned from successful write operations. Most
-  # of the time, not all base relations need respective
-  # mappers.
-  #
-  #  :people,
-  #  :tasks,
-  #])
+end
 
-  models             = definition_registry.models(:anima)
-  entity_environment = definition_registry.environment(models)
+options  = Ramom::Schema::Mapping.default_options(schema_definition)
+dressers = Mom::Definition::Registry.build(options) do
 
-  # (4) Connect schema relations with DTO mappers
+  register :page_info do
+    map :number, from: :number
+    map :limit , from: :limit
+    map :total , from: :total
+  end
 
-  # The commented mappings are inferred automatically
-  mapping = Ramom::Mapping.new(entity_environment) # do
-  #  map :accounts,       :account
-  #  map :people,         :person
-  #  map :tasks,          :task
-  #  map :person_details, :detailed_person
-  #  map :task_details,   :detailed_task
-  #  map :actors,         :actor
-  #end
+  register :dashboard do
+    wrap :person do
+      map :id
+      map :name
+    end
 
-  # (5) Connect the relation schema to a database
+    wrap :events_page,       entity: :page_info
+    wrap :instructions_page, entity: :page_info
 
-  adapter = Axiom::Adapter::DataObjects.new(uri)
+    group :events do
+      map :id
+      map :name
+      map :created_at
+    end
 
-  let(:db) { Ramom::Reader.build(adapter, schema_definition, mapping) }
+    group :instructions do
+      map :id
+      map :name
+      map :date
+    end
+  end
+end
 
-  let(:account) { db.one(:accounts) }
-  let(:person)  { db.one(:people) }
-  let(:task)    { db.one(:tasks) }
+# This mutates +definition_registry+ and adds base relation mappers
+Ramom::EntityBuilder.call(schema_definition, dressers) #, [
+#
+# Passing a whitelist of base relation names to generate
+# mappers from is also supported. If no relation names
+# are given, mappers for all base relations are generated.
+#
+# This is useful for automatically generating mappers
+# that are used for mapping base relation tuples that
+# get returned from successful write operations. Most
+# of the time, not all base relations need respective
+# mappers.
+#
+#  :people,
+#  :employments,
+#])
 
-  it 'provides access to base relations' do
-    expect(account.id).to_not be(nil)
-    expect(account.email).to eq('test@test.com')
+INPUT_DRESSERS  = {} # TODO add some
+OUTPUT_DRESSERS = Mom.object_mappers(dressers)
+
+class C < Ramom::Command
+  include Ramom::Operation::Registrar.build(INPUT_DRESSERS)
+end
+
+class Q < Ramom::Query
+  include Ramom::Operation::Registrar.build(OUTPUT_DRESSERS)
+end
+
+class ListPeople < Q
+  register :people, dresser: :person
+
+  def call
+    read(rel(:people))
+  end
+end
+
+class ShowDashboard < Q
+  register :dashboard, dresser: :dashboard
+
+  def call(params)
+    one(rel(:dashboard, params[:employment_id]))
+  end
+end
+
+adapter     = Axiom::Adapter::DataObjects.new(uri)
+schema      = Ramom::Schema.build(adapter, schema_definition)
+writer      = Ramom::Writer::DM.build(DataMapper::Model.descendants)
+database    = Ramom::Database.new(schema, writer)
+environment = Ramom::Operation::Environment.new(database: database)
+
+describe 'ramom' do
+  let(:db) { Ramom::Facade.new(C.registry, Q.registry, environment) }
+
+  it 'does allow to call external relations directly' do
+    expect {
+      schema.dashboard(1)
+    }.to_not raise_error(NoMethodError)
+  end
+
+  it 'does not allow to call internal relations directly' do
+    expect {
+      schema.employee(1)
+    }.to raise_error(NoMethodError)
+  end
+
+  it 'supports reading dressed base relations' do
+    person = db.read(:people).one
 
     expect(person.id).to_not be(nil)
     expect(person.name).to eq('snusnu')
-    expect(person.account_id).to eql(account.id)
-
-    expect(db.read(:accounts).sort.one).to eql(account)
-    expect(db.read(:people).sort.one).to eql(person)
   end
 
-  it 'provides access to virtual relations' do
-    a = db.one(:actors, 1)
-    expect(a.id).to eq(person.id)
-    expect(a.name).to eq(person.name)
-    expect(a.account.id).to eq(account.id)
-    expect(a.account.email).to eq(account.email)
+  it 'supports reading dressed virtual relations' do
+    d = db.read(:dashboard, employment_id: 1)
 
-    dt = db.one(:task_details, 1)
-    expect(dt.id).to eq(task.id)
-    expect(dt.name).to eq(task.name)
-    expect(dt.person.id).to eq(person.id)
-    expect(dt.person.name).to eq(person.name)
-    expect(dt.person.account.id).to eql(account.id)
-    expect(dt.person.account.email).to eql(account.email)
+    expect(d.person.id).to_not be(nil)
+    expect(d.person.name).to eq('snusnu')
 
-    dp = db.one(:person_details, 1)
-    expect(dp.id).to eq(person.id)
-    expect(dp.name).to eq(person.name)
-    expect(dp.account.id).to eq(account.id)
-    expect(dp.account.email).to eq(account.email)
+    expect(d.events_page.number).to be(1)
+    expect(d.events_page.limit).to be(2)
+    expect(d.events_page.total).to be(3)
 
-    t = dp.tasks.first
-    expect(t.id).to eq(task.id)
-    expect(t.name).to eq(task.name)
+    expect(d.instructions_page.number).to be(1)
+    expect(d.instructions_page.limit).to be(2)
+    expect(d.instructions_page.total).to be(3)
 
-    tuple  = db.schema.actors(1).sort.one
-    mapper = db.mapping[:actors]
+    expect(d.events.size).to be(2)
 
-    expect(mapper.load(tuple)).to eql(a)
+    d.events.each_with_index do |event, i|
+      expect(event.id).to_not be(nil)
+      expect(event.name).to eq("event #{i+1}")
+      expect(event.created_at).to eq(DateTime.new(2014, 7, i+1))
+    end
 
-    expect {
-      db.schema.task_actors(1).one
-    }.to raise_error(NoMethodError)
+    expect(d.instructions.size).to be(2)
+
+    d.instructions.each_with_index do |instruction, i|
+      expect(instruction.id).to_not be(nil)
+      expect(instruction.name).to eq("instruction #{i+1}")
+      expect(instruction.date).to eq(DateTime.new(2014, 7, i+1))
+    end
   end
 end

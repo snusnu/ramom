@@ -18,9 +18,9 @@ gem 'morpher',               git: "#{MBJ}/morpher.git",                branch: M
 gem 'lupo',                  git: "#{SNUSNU}/lupo.git",                branch: MASTER
 gem 'procto',                git: "#{SNUSNU}/procto.git",              branch: MASTER
 
-gem 'axiom',                 git: "#{DKUBB}/axiom.git",                branch: MASTER
+gem 'axiom',                 git: "#{DKUBB}/axiom.git",                branch: 'add-relation-one'
 gem 'axiom-optimizer',       git: "#{DKUBB}/axiom-optimizer.git",      branch: MASTER
-gem 'axiom-do-adapter',      git: "#{DKUBB}/axiom-do-adapter.git",     branch: MASTER
+gem 'axiom-do-adapter',      git: "#{DKUBB}/axiom-do-adapter.git",     branch: 'add-relation-one'
 gem 'axiom-types',           git: "#{DKUBB}/axiom-types.git",          branch: MASTER
 
 group :development do

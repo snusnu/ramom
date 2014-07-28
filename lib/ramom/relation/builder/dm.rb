@@ -17,17 +17,20 @@ module Ramom
         private
 
         attr_reader :name_generator
+        attr_reader :properties
 
         def name
           model.storage_name(:default).to_sym
         end
 
-        def header
-          @properties.map { |p| [p.field.to_sym, p.primitive, {keys: keys}] }
+        def attributes
+          properties.map { |p| [p.field.to_sym, p.primitive] }
         end
 
         def keys
-          @properties.unique_indexes.values
+          properties.unique_indexes.values.map { |cpk|
+            cpk.map { |k| k.to_sym }
+          }
         end
 
       end # DM

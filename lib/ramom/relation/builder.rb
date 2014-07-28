@@ -9,7 +9,7 @@ module Ramom
       include Procto.call
 
       abstract_method :name
-      abstract_method :header
+      abstract_method :attributes
       abstract_method :keys
       abstract_method :name_generator
 
@@ -19,8 +19,12 @@ module Ramom
 
       private
 
+      def header
+        Axiom::Relation::Header.coerce(attributes, keys: keys)
+      end
+
       def aliases
-        header.each_with_object({}) { |(attr_name, _), hash|
+        attributes.each_with_object({}) { |(attr_name, _), hash|
           aliased = name_generator.call(name, attr_name)
           hash[attr_name] = aliased if attr_name != aliased
         }

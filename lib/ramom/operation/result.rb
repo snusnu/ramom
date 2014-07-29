@@ -1,29 +1,27 @@
 # encoding: utf-8
 
 module Ramom
-  class Database
-    class Operation
+  module Operation
 
-      class Result
+    class Result
 
-        include Concord::Public.new(:output)
-        include AbstractType
+      include Concord::Public.new(:output)
+      include AbstractType
 
-        abstract_method :success?
+      abstract_method :success?
 
-        class Success < self
-          def success?
-            true
-          end
-        end # Success
+      class Success < self
+        def success?
+          true
+        end
+      end # Success
 
-        class Failure < self
-          def success?
-            false
-          end
-        end # Failure
+      class Failure < self
+        def success?
+          false
+        end
+      end # Failure
 
-      end # Result
-    end # Operation
-  end # Database
+    end # Result
+  end # Operation
 end # Ramom

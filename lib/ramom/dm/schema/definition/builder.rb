@@ -29,7 +29,7 @@ module Ramom
               add_fk_constraints(model)
 
               fk_attributes  = fk_constraints.source_attributes
-              name_generator = Ramom::Schema::Mapping::NaturalJoin.new(fk_attributes)
+              name_generator = Naming::NaturalJoin.new(fk_attributes)
 
               source_name = relation_name(model)
               relation    = relation_builder.call(model, name_generator)

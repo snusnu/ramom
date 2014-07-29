@@ -9,6 +9,7 @@ require 'mom'
 
 require 'ramom'
 require 'ramom/dm'
+require 'ramom/mom'
 
 require 'axiom-do-adapter'
 
@@ -152,7 +153,7 @@ schema_definition = Ramom::Schema.define(options) do
 
 end
 
-options  = Ramom::Schema::Mapping.default_options(schema_definition)
+options  = Ramom::Mom.definition_options(schema_definition)
 dressers = Mom::Definition::Registry.build(options) do
 
   register :page_info do
@@ -185,7 +186,7 @@ dressers = Mom::Definition::Registry.build(options) do
 end
 
 # This mutates +dressers+ and adds base relation mappers
-Ramom::EntityBuilder.call(schema_definition, dressers) #, [
+Ramom::Mom::EntityBuilder.call(schema_definition, dressers) #, [
 #
 # Passing a whitelist of base relation names to generate
 # mappers from is also supported. If no relation names

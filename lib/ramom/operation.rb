@@ -2,18 +2,14 @@
 
 module Ramom
 
-  class Operation
+  module Operation
 
-    include Concord.new(:environment, :dresser)
+    include Concord.new(:name, :environment, :dresser)
     include AbstractType
 
     abstract_method :call
 
-    def self.call(environment, dresser, *args, &block)
-      new(environment, dresser).call(*args, &block)
-    end
-
-    def initialize(environment, dresser)
+    def initialize(name, environment, dresser)
       super
       @db = environment.database
     end

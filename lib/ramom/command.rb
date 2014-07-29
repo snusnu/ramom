@@ -2,7 +2,10 @@
 
 module Ramom
 
-  class Command < Operation
+  module Command
+
+    extend  Operation::Registrar::Callsite
+    include Operation
 
     def one(relation_name, attributes)
       model = backend[relation_name]

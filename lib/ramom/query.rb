@@ -2,7 +2,10 @@
 
 module Ramom
 
-  class Query < Operation
+  module Query
+
+    extend  Operation::Registrar::Callsite
+    include Operation
 
     def one(relation, &block)
       read(relation).one(&block)

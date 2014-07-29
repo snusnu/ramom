@@ -1,30 +1,30 @@
 # encoding: utf-8
 
 module Ramom
-  class Operation
-
-    class Proxy
-      include Anima.new(:name, :operation, :dresser)
-
-      def call(environment, *args)
-        operation.call(environment, dresser, *args)
-      end
-    end
+  module Operation
 
     class Registry
-      include Concord.new(:dressers, :operations)
+      include Concord.new(:dressers, :environment, :operation)
       include Lupo.enumerable(:operations)
 
-      def register(name, options, operation)
-        operations[name] = Proxy.new(
-          name:      name,
-          operation: operation,
-          dresser:   dressers[options.fetch(:dresser)]
-        )
+      def initialize(*args)
+        super
+        @operations = {}
+      end
+
+      def register(name, options, &block)
+        dresser = dressers[options.fetch(:dresser)]
+
+        op = operation.new(name, environment, dresser)
+        (class << op; self end).class_eval {
+          define_method(:call, &block)
+        }
+
+        @operations[name] = op
       end
 
       def fetch(*args, &block)
-        operations.fetch(*args, &block)
+        @operations.fetch(*args, &block)
       end
     end # Registry
   end # Operation

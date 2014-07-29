@@ -210,38 +210,31 @@ Ramom::EntityBuilder.call(schema_definition, dressers) #, [
 INPUT_DRESSERS  = {} # TODO add some
 OUTPUT_DRESSERS = Mom.object_mappers(dressers)
 
-class C < Ramom::Command
-  include Ramom::Operation::Registrar.build(INPUT_DRESSERS)
+adapter  = Axiom::Adapter::DataObjects.new(uri)
+schema   = Ramom::Schema.build(adapter, schema_definition)
+writer   = Ramom::Writer::DM.build(DataMapper::Model.descendants)
+database = Ramom::Database.new(schema, writer)
+
+OP_ENV = Ramom::Operation::Environment.new(database: database)
+
+class C
+  include Ramom.command(INPUT_DRESSERS, OP_ENV, self)
 end
 
-class Q < Ramom::Query
-  include Ramom::Operation::Registrar.build(OUTPUT_DRESSERS)
+class Q
+  include Ramom.query(OUTPUT_DRESSERS, OP_ENV, self)
 end
 
-class ListPeople < Q
-  register :people, dresser: :person
-
-  def call
-    read(rel(:people))
-  end
+Q.register :people, dresser: :person do
+  read(rel(:people))
 end
 
-class ShowDashboard < Q
-  register :dashboard, dresser: :dashboard
-
-  def call(params)
-    one(rel(:dashboard, params[:company_id], params[:employment_id]))
-  end
+Q.register :dashboard, dresser: :dashboard do |params|
+  one(rel(:dashboard, params[:company_id], params[:employment_id]))
 end
-
-adapter     = Axiom::Adapter::DataObjects.new(uri)
-schema      = Ramom::Schema.build(adapter, schema_definition)
-writer      = Ramom::Writer::DM.build(DataMapper::Model.descendants)
-database    = Ramom::Database.new(schema, writer)
-environment = Ramom::Operation::Environment.new(database: database)
 
 describe 'ramom' do
-  let(:db) { Ramom::Facade.build(C, Q, environment) }
+  let(:db) { Ramom::Facade.build(C, Q) }
 
   it 'does allow to call external relations directly' do
     expect { schema.dashboard(1, 1) }.to_not raise_error

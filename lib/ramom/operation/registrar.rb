@@ -1,28 +1,35 @@
 # encoding: utf-8
 
 module Ramom
-  class Operation
+  module Operation
 
     class Registrar < Module
 
+      module Callsite
+        def registrar(*args)
+          Registrar.build(self, *args)
+        end
+      end
+
       module ClassMethods
-        def register(name, options)
-          registry.register(name, options, self)
+        def register(name, options, &block)
+          registry.register(name, options, &block)
         end
       end # ClassMethods
 
-      include Concord.new(:registry)
+      include Concord.new(:registry, :kind)
 
-      def self.build(dressers, operations = EMPTY_HASH)
-        new(Registry.new(dressers, operations.dup))
+      def self.build(kind, dressers, environment, operation)
+        new(Registry.new(dressers, environment, operation), kind)
       end
 
       private
 
       def included(host)
-        host.instance_exec(registry) do |registry|
+        host.instance_exec(registry, kind) do |registry, kind|
           define_singleton_method(:registry) { registry }
           extend(ClassMethods)
+          include(kind)
         end
       end
     end # Registrar

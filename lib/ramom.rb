@@ -28,6 +28,14 @@ module Ramom
   # An empty frozen array
   EMPTY_ARRAY = [].freeze
 
+  def self.command(*args)
+    Command.registrar(*args)
+  end
+
+  def self.query(*args)
+    Query.registrar(*args)
+  end
+
 end # Ramom
 
 require 'ramom/version'

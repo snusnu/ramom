@@ -1,9 +1,9 @@
 # encoding: utf-8
 
 module Ramom
-  class Writer
+  module DM
 
-    class DM < self
+    class Writer < Ramom::Writer
 
       class Backend
 

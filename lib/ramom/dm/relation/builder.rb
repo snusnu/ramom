@@ -1,10 +1,10 @@
 # encoding: utf-8
 
 module Ramom
-  class Relation
-    class Builder
+  module DM
+    module Relation
 
-      class DM < self
+      class Builder < Ramom::Relation::Builder
 
         include Concord.new(:model)
 
@@ -33,7 +33,7 @@ module Ramom
           }
         end
 
-      end # DM
-    end # Builder
-  end # Relation
+      end # Builder
+    end # Relation
+  end # DM
 end # Ramom

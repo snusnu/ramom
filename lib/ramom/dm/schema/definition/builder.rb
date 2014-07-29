@@ -1,17 +1,17 @@
 # encoding: utf-8
 
 module Ramom
-  class Schema < BasicObject
-    class Definition
-      class Builder
+  module DM
+    module Schema
+      module Definition
 
-        class DM < self
+        class Builder < Ramom::Schema::Definition::Builder
 
           include Concord.new(:models, :fk_constraints)
           include Procto.call
 
           # This object mutates the injected +fk_constraints+
-          def initialize(models, fk_constraints = FKConstraint::Set.new)
+          def initialize(models, fk_constraints = Ramom::Schema::FKConstraint::Set.new)
             super
           end
 
@@ -29,7 +29,7 @@ module Ramom
               add_fk_constraints(model)
 
               fk_attributes  = fk_constraints.source_attributes
-              name_generator = Mapping::NaturalJoin.new(fk_attributes)
+              name_generator = Ramom::Schema::Mapping::NaturalJoin.new(fk_attributes)
 
               source_name = relation_name(model)
               relation    = relation_builder.call(model, name_generator)
@@ -64,10 +64,10 @@ module Ramom
           end
 
           def relation_builder
-            Relation::Builder::DM
+            Relation::Builder
           end
-        end # DM
-      end # Builder
-    end # Definition
-  end # Schema
+        end # Builder
+      end # Definition
+    end # Schema
+  end # DM
 end # Ramom

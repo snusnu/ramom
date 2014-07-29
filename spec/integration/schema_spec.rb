@@ -8,9 +8,7 @@ require 'dm-migrations'
 require 'mom'
 
 require 'ramom'
-require 'ramom/relation/builder/dm'
-require 'ramom/schema/definition/builder/dm'
-require 'ramom/writer/dm'
+require 'ramom/dm'
 
 require 'axiom-do-adapter'
 
@@ -109,7 +107,7 @@ puts
 # (2) Initialize a new Ramom::Schema
 
 models        = DataMapper::Model.descendants
-dm_definition = Ramom::Schema::Definition::Builder::DM.call(models)
+dm_definition = Ramom::DM::Schema::Definition::Builder.call(models)
 
 options = {
   base:           dm_definition[:base_relations],
@@ -213,7 +211,7 @@ OUTPUT_DRESSERS = Mom.object_mappers(dressers)
 
 adapter  = Axiom::Adapter::DataObjects.new(uri)
 schema   = Ramom::Schema.build(adapter, schema_definition)
-writer   = Ramom::Writer::DM.build(DataMapper::Model.descendants)
+writer   = Ramom::DM::Writer.build(DataMapper::Model.descendants)
 database = Ramom::Database.new(schema, writer)
 
 OP_ENV = Ramom::Operation::Environment.new(database: database)

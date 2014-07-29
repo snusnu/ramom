@@ -126,11 +126,11 @@ schema_definition = Ramom::Schema.define(options) do
       join(page(instructions, [:instruction_date], 2, 2)).
       join(page(events,       [:event_created_at], 2, 2)).
       wrap(
-        person: people.header.map(&:name)
+        person: h(people)
       ).
       group(
-        events:       events.header.map(&:name),
-        instructions: instructions.header.map(&:name),
+        events:       h(events),
+        instructions: h(instructions),
       ),
       instructions_page: {
         number: 2,

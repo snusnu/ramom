@@ -72,6 +72,12 @@ module Ramom
 
     private
 
+    def header(relation)
+      relation.header.map(&:name)
+    end
+
+    alias_method :h, :header
+
     def puts(*args)
       ::Kernel.puts(*args)
     end

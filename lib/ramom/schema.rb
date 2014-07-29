@@ -60,7 +60,7 @@ module Ramom
 
     PAGE_DETAILS_ATTRS = [:number, :limit, :total].freeze
 
-    def add_page_info(relation, page_details)
+    def with_page_info(relation, page_details)
       page_details.inject(relation) { |rel, (name, details)|
         rel.extend { |r|
           r.add(:number, details.fetch(:number))

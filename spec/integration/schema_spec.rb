@@ -119,18 +119,19 @@ options = {
 schema_definition = Ramom::Schema.define(options) do
 
   external :dashboard do |company_id, employment_id|
-    rel = employee(employment_id).
+    with_page_info(
+      employee(employment_id).
       join(people).
       join(companies).
       join(page(instructions, [:instruction_date], 2, 2)).
       join(page(events,       [:event_created_at], 2, 2)).
-      wrap(person: people.header.map(&:name)).
+      wrap(
+        person: people.header.map(&:name)
+      ).
       group(
         events:       events.header.map(&:name),
         instructions: instructions.header.map(&:name),
-      )
-
-    add_page_info(rel, {
+      ),
       instructions_page: {
         number: 2,
         limit:  2,
@@ -140,8 +141,8 @@ schema_definition = Ramom::Schema.define(options) do
         number: 2,
         limit:  2,
         rel: company_events(company_id)
-      },
-    })
+      }
+    )
   end
 
   internal :employee do |employment_id|

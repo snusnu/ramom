@@ -3,7 +3,7 @@
 module Ramom
 
   class Reader
-    include Concord::Public.new(:relation, :dresser)
+    include Concord.new(:relation, :dresser)
     include Enumerable
 
     def one(&block)

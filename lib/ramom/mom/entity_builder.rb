@@ -15,7 +15,7 @@ module Ramom
         schema_definition.base_relations.each do |name, base_relation|
           next unless build?(name)
 
-          mapper_name = singularize(name)
+          mapper_name = ::Mom.singularize(name)
           attr_names  = base_relation.header.map(&:name)
           attributes  = attributes_hash(mapper_name, attr_names)
 
@@ -38,11 +38,7 @@ module Ramom
       end
 
       def mapped_name(attr_name, mapper_name)
-        attr_name.to_s.sub("#{singularize(mapper_name)}_", EMPTY_STRING).to_sym
-      end
-
-      def singularize(word)
-        Inflecto.singularize(word.to_s).to_sym
+        attr_name.to_s.sub("#{::Mom.singularize(mapper_name)}_", EMPTY_STRING).to_sym
       end
     end # EntityBuilder
   end # Mom

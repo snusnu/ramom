@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 module Ramom
-  class Relation
+  module Relation
 
     class Builder
 

@@ -106,13 +106,8 @@ puts
 
 # (2) Initialize a new Ramom::Schema
 
-models        = DataMapper::Model.descendants
-dm_definition = Ramom::DM::Schema::Definition::Builder.call(models)
-
-options = {
-  base:           dm_definition[:base_relations],
-  fk_constraints: dm_definition[:fk_constraints]
-}
+models  = DataMapper::Model.descendants
+options = Ramom::DM.schema_definition_options(models)
 
 schema_definition = Ramom::Schema.define(options) do
 

@@ -38,7 +38,8 @@ module Ramom
       end
 
       def mapped_name(attr_name, mapper_name)
-        attr_name.to_s.sub("#{::Mom.singularize(mapper_name)}_", EMPTY_STRING).to_sym
+        prefix = "#{::Mom.singularize(mapper_name)}_"
+        attr_name.to_s.sub(prefix, EMPTY_STRING).to_sym
       end
     end # EntityBuilder
   end # Mom

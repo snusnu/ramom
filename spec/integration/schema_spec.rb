@@ -120,7 +120,7 @@ schema_definition = Ramom::Schema.define(options) do
 
   external :dashboard do |company_id, employment_id|
     with_page_info(
-      employee(employment_id).
+      employees(employment_id).
       join(people).
       join(companies).
       join(page(instructions, [:instruction_date], 2, 2)).
@@ -145,7 +145,7 @@ schema_definition = Ramom::Schema.define(options) do
     )
   end
 
-  internal :employee do |employment_id|
+  internal :employees do |employment_id|
     employments.restrict(employment_id: employment_id)
   end
 
@@ -242,7 +242,7 @@ describe 'ramom' do
   end
 
   it 'does not allow to call internal relations directly' do
-    expect { schema.employee(1) }.to raise_error(NoMethodError)
+    expect { schema.employees(1) }.to raise_error(NoMethodError)
   end
 
   it 'supports reading dressed base relations' do

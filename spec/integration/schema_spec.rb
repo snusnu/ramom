@@ -244,15 +244,11 @@ describe 'ramom' do
   let(:db) { Ramom::Facade.build(C, Q, environment) }
 
   it 'does allow to call external relations directly' do
-    expect {
-      schema.dashboard(1, 1)
-    }.to_not raise_error
+    expect { schema.dashboard(1, 1) }.to_not raise_error
   end
 
   it 'does not allow to call internal relations directly' do
-    expect {
-      schema.employee(1)
-    }.to raise_error
+    expect { schema.employee(1) }.to raise_error(NoMethodError)
   end
 
   it 'supports reading dressed base relations' do

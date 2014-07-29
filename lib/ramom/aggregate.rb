@@ -2,7 +2,7 @@
 
 module Ramom
 
-  class Aggregator
+  class Aggregate
     include Concord.new(:relation)
 
     def count(attribute = nil)
@@ -21,5 +21,5 @@ module Ramom
       # attribute. Afaik, RA doesn't support NULL anyways
       relation.header.to_a.detect { |a| a.required? }.name
     end
-  end # Aggregator
+  end # Aggregate
 end # Ramom

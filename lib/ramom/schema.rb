@@ -53,7 +53,7 @@ module Ramom
     # Make aggregate functions easily available
     #
     def count(relation, attribute_name = nil)
-      Aggregator.new(relation).count(attribute_name)
+      Aggregate.new(relation).count(attribute_name)
     end
 
     # Helper for pagination UX

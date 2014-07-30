@@ -20,7 +20,7 @@ module Ramom
                 public(name)
               end
             end
-            container
+            self
           end
         end # Base
 
@@ -33,7 +33,7 @@ module Ramom
                 send(relation.visibility, name)
               end
             end
-            container
+            self
           end
         end # Virtual
       end # Compiler

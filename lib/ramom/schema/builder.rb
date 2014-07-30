@@ -16,8 +16,10 @@ module Ramom
 
       def call
         relations = Module.new
-        relations = Definition::Compiler::Base.call(base_relations, relations)
-        relations = Definition::Compiler::Virtual.call(@virtual_relations, relations)
+
+        # Compile relation access methods onto +relations+ lvar
+        Definition::Compiler::Base.call(base_relations, relations)
+        Definition::Compiler::Virtual.call(@virtual_relations, relations)
 
         Class.new(Schema) { include(relations) }
       end

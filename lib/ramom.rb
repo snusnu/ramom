@@ -40,10 +40,9 @@ end # Ramom
 
 require 'ramom/version'
 require 'ramom/relation/builder'
-require 'ramom/schema/definition'
 require 'ramom/schema/fk_constraint'
-require 'ramom/schema/definition/builder'
-require 'ramom/schema/definition/builder/context'
+require 'ramom/schema/definition'
+require 'ramom/schema/definition/context'
 require 'ramom/schema/definition/compiler'
 require 'ramom/naming/natural_join'
 require 'ramom/schema/builder'

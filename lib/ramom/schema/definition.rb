@@ -3,11 +3,22 @@
 module Ramom
   class Schema < BasicObject
     class Definition
-      include Concord.new(:context)
+
+      DEFAULT_OPTIONS = {
+        base:           {},
+        virtual:        {},
+        fk_constraints: FKConstraint::Set.new
+      }.freeze
 
       def self.context(base_relations, fk_constraints, virtual = EMPTY_HASH)
         Builder::Context.new(base_relations, fk_constraints, virtual.dup)
       end
+
+      def self.build(options, &block)
+        new(Context.new(DEFAULT_OPTIONS.dup.merge(options), &block))
+      end
+
+      include Concord.new(:context)
 
       attr_reader :base_relations
       attr_reader :virtual_relations

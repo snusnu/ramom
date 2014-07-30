@@ -4,7 +4,7 @@ module Ramom
   class Schema < BasicObject
 
     def self.define(options, &block)
-      Definition::Builder.call(options, &block)
+      Definition.build(options, &block)
     end
 
     def self.build(*args)

@@ -44,22 +44,6 @@ module Ramom
             virtual[name] = Relation.new(name, visibility, block)
           end
         end # Context
-
-        DEFAULT_OPTIONS = {
-          base:           EMPTY_HASH,
-          virtual:        EMPTY_HASH,
-          fk_constraints: FKConstraint::Set.new
-        }.freeze
-
-        include Anima.new(:base, :fk_constraints, :virtual, :block)
-
-        def self.call(options, &block)
-          new(DEFAULT_OPTIONS.merge(options).merge!(block: block)).call
-        end
-
-        def call
-          Definition.new(Context.call(base, fk_constraints, virtual, &block))
-        end
       end # Builder
     end # Definition
   end # Schema

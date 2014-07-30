@@ -3,14 +3,8 @@
 module Ramom
   class Schema < BasicObject
 
-    DEFAULT_OPTIONS = {
-      base:           EMPTY_HASH,
-      virtual:        EMPTY_HASH,
-      fk_constraints: FKConstraint::Set.new
-    }.freeze
-
     def self.define(options, &block)
-      Definition::Builder.call(DEFAULT_OPTIONS.merge(options).merge!(block: block))
+      Definition::Builder.call(options, &block)
     end
 
     def self.build(*args)

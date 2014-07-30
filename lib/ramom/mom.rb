@@ -9,7 +9,11 @@ module Ramom
         name_generator: Naming::NaturalJoin.new(schema_definition.fk_mapping)
       }
     end
+
+    def self.register_base_relation_definitions(schema_definition, definition_registry, names = EMPTY_ARRAY)
+      Definition::Registrar.call(schema_definition, definition_registry, names)
+    end
   end # Mom
 end # Ramom
 
-require 'ramom/mom/entity_builder'
+require 'ramom/mom/definition/registrar'

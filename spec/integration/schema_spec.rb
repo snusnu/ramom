@@ -186,7 +186,7 @@ dressers = Mom::Definition::Registry.build(options) do
 end
 
 # This mutates +dressers+ and adds base relation mappers
-Ramom::Mom::EntityBuilder.call(schema_definition, dressers) #, [
+Ramom::Mom.register_base_relation_definitions(schema_definition, dressers)#, [
 #
 # Passing a whitelist of base relation names to generate
 # mappers from is also supported. If no relation names

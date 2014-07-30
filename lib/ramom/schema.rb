@@ -20,12 +20,28 @@ module Ramom
 
       # Useful relational operators not present in axiom
 
+      def allbut(relation, attribute_names)
+        relation.project(attr_names(relation) - attribute_names)
+      end
+
       def page(relation, order, number, limit)
         frame(relation, order, number * limit - limit, limit)
       end
 
       def frame(relation, order, offset, limit)
         relation.sort_by(order).drop(offset).take(limit)
+      end
+
+      def matching(left, right)
+        left.join(right).project(attr_names(left))
+      end
+
+      def not_matching(left, right)
+        left - matching(left, right)
+      end
+
+      def matching_on(left, right, right_names)
+        matching(left, right.project(right_names))
       end
 
       # Make aggregate functions easily available
@@ -50,11 +66,11 @@ module Ramom
 
       private
 
-      def header(relation)
+      def attr_names(relation)
         relation.header.map(&:name)
       end
 
-      alias_method :h, :header
+      alias_method :h, :attr_names
 
       def puts(*args)
         ::Kernel.puts(*args)

@@ -26,12 +26,8 @@ module Ramom
 
       def base_relations
         @base_relations.each_with_object({}) { |(name, relation), relations|
-          relations[name] = base_relation(name, relation)
+          relations[name] = Axiom::Relation::Gateway.new(adapter, relation)
         }
-      end
-
-      def base_relation(_name, relation)
-        Axiom::Relation::Gateway.new(adapter, relation)
       end
     end # Builder
   end # Schema

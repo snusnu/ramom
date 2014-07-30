@@ -6,6 +6,11 @@ module Ramom
     class FKConstraint
 
       class Set
+
+        def self.fk_attributes(fkc_set)
+          fkc_set.reduce(::Set.new) { |set, fkc| set + fkc.source_attributes }
+        end
+
         include Lupo.collection(:constraints)
 
         def initialize(constraints = FK_C_HASH.dup)
@@ -22,12 +27,8 @@ module Ramom
 
         def source_attributes
           constraints.reduce({}) { |h, (source_name, fkc_set)|
-            h.merge(source_name => fk_attributes(fkc_set))
+            h.merge(source_name => self.class.fk_attributes(fkc_set))
           }
-        end
-
-        def fk_attributes(fkc_set)
-          fkc_set.reduce(::Set.new) { |set, fkc| set + fkc.source_attributes }
         end
       end # Set
 

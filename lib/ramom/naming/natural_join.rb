@@ -8,7 +8,7 @@ module Ramom
 
       def call(base_name, attribute_name)
         return attribute_name if fk_attribute?(base_name, attribute_name)
-        :"#{Inflecto.singularize(base_name)}_#{attribute_name}"
+        :"#{Inflecto.singularize(base_name.to_s)}_#{attribute_name}"
       end
 
       private

@@ -10,10 +10,6 @@ module Ramom
         fk_constraints: FKConstraint::Set.new
       }.freeze
 
-      def self.context(base_relations, fk_constraints, virtual = EMPTY_HASH)
-        Builder::Context.new(base_relations, fk_constraints, virtual.dup)
-      end
-
       def self.build(options, &block)
         new(Context.new(DEFAULT_OPTIONS.dup.merge(options), &block))
       end

@@ -21,10 +21,6 @@ module Ramom
           constraints[source] << FKConstraint.new(source, target, mapping)
         end
 
-        def [](source_name)
-          constraints[source_name]
-        end
-
         def source_attributes
           constraints.reduce({}) { |h, (source_name, fkc_set)|
             h.merge(source_name => self.class.fk_attributes(fkc_set))

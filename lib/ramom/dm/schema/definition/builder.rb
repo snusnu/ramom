@@ -5,7 +5,7 @@ module Ramom
     module Schema
       module Definition
 
-        class Builder < Ramom::Schema::Definition::Builder
+        class Builder
 
           include Concord.new(:models, :fk_constraints)
           include Procto.call

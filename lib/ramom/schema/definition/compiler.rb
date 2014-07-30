@@ -13,8 +13,7 @@ module Ramom
 
         class Base < self
           def call
-            relations = self.relations
-            container.module_eval do
+            container.instance_exec(relations) do |relations|
               relations.each do |(name, relation)|
                 define_method(name) { relation }
                 public(name)
@@ -26,8 +25,7 @@ module Ramom
 
         class Virtual < self
           def call
-            relations = self.relations
-            container.module_eval do
+            container.instance_exec(relations) do |relations|
               relations.each do |(name, relation)|
                 define_method(name, &relation.body)
                 send(relation.visibility, name)

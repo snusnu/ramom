@@ -24,8 +24,8 @@ module Ramom
 
       # TODO think about a better name (for the natural join strategy)
       def fk_mapping
-        fk_attributes.each_with_object({}) { |(source_name, attrs), hash|
-          hash[Inflecto.singularize(source_name.to_s).to_sym] = attrs
+        fk_attributes.each_with_object({}) { |(source_name, attrs), h|
+          h[Inflecto.singularize(source_name.to_s).to_sym] = attrs
         }
       end
     end # Definition

@@ -24,9 +24,9 @@ module Ramom
       end
 
       def aliases
-        attributes.each_with_object({}) { |(attr_name, _), hash|
+        attributes.each_with_object({}) { |(attr_name, _), h|
           aliased = name_generator.call(name, attr_name)
-          hash[attr_name] = aliased if attr_name != aliased
+          h[attr_name] = aliased if attr_name != aliased
         }
       end
 

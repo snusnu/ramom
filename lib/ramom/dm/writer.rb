@@ -34,9 +34,9 @@ module Ramom
 
         def self.build(models, &block)
           mapping = Mapping.new(&block)
-          new(models.each_with_object({}) { |model, hash|
+          new(models.each_with_object({}) { |model, h|
             relation_name, mapped_model = mapping.call(model)
-            hash[relation_name] = mapped_model
+            h[relation_name] = mapped_model
           })
         end
 

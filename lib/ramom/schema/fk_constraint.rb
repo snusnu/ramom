@@ -21,8 +21,8 @@ module Ramom
         end
 
         def source_attributes
-          constraints.reduce({}) { |hash, (source_name, fkc_set)|
-            hash.merge(source_name => fk_attributes(fkc_set))
+          constraints.reduce({}) { |h, (source_name, fkc_set)|
+            h.merge(source_name => fk_attributes(fkc_set))
           }
         end
 

@@ -33,8 +33,8 @@ module Ramom
         end
 
         def attributes_hash(mapper_name, attr_names)
-          attr_names.each_with_object({}) { |name, hash|
-            hash[name] = mapped_name(name, mapper_name)
+          attr_names.each_with_object({}) { |name, h|
+            h[name] = mapped_name(name, mapper_name)
           }
         end
 

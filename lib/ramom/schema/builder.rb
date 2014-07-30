@@ -4,13 +4,13 @@ module Ramom
   class Schema < BasicObject
     class Builder
 
-      include Concord.new(:adapter, :schema_definition)
+      include Concord.new(:adapter, :definition, :base)
       include Procto.call
 
       def initialize(*)
         super
-        @base_relations    = base_relations(schema_definition.base_relations)
-        @virtual_relations = schema_definition.virtual_relations
+        @base_relations    = base_relations(definition.base_relations)
+        @virtual_relations = definition.virtual_relations
       end
 
       def call
@@ -20,7 +20,7 @@ module Ramom
         Definition::Compiler::Base.call(@base_relations, relations)
         Definition::Compiler::Virtual.call(@virtual_relations, relations)
 
-        Class.new(Schema) { include(relations) }
+        Class.new(base) { include(relations) }
       end
 
       private

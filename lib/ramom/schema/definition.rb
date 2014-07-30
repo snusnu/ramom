@@ -20,6 +20,7 @@ module Ramom
       attr_reader :virtual_relations
       attr_reader :fk_constraints
       attr_reader :fk_attributes
+      attr_reader :fk_mapping # TODO think about a better name
 
       def initialize(context)
         super
@@ -27,10 +28,12 @@ module Ramom
         @virtual_relations = context.virtual
         @fk_constraints    = context.fk_constraints
         @fk_attributes     = fk_constraints.source_attributes
+        @fk_mapping        = initialize_fk_mapping
       end
 
-      # TODO think about a better name (for the natural join strategy)
-      def fk_mapping
+      private
+
+      def initialize_fk_mapping
         fk_attributes.each_with_object({}) { |(source_name, attrs), h|
           h[Inflecto.singularize(source_name.to_s).to_sym] = attrs
         }

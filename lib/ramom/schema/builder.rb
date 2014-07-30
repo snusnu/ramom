@@ -5,7 +5,6 @@ module Ramom
     class Builder
 
       include Concord.new(:adapter, :schema_definition)
-      include Adamantium::Flat
       include Procto.call
 
       def initialize(*)

@@ -10,7 +10,7 @@ module Ramom
 
       def initialize(*)
         super
-        @base_relations    = schema_definition.base_relations
+        @base_relations    = base_relations(schema_definition.base_relations)
         @virtual_relations = schema_definition.virtual_relations
       end
 
@@ -18,7 +18,7 @@ module Ramom
         relations = Module.new
 
         # Compile relation access methods onto +relations+ lvar
-        Definition::Compiler::Base.call(base_relations, relations)
+        Definition::Compiler::Base.call(@base_relations, relations)
         Definition::Compiler::Virtual.call(@virtual_relations, relations)
 
         Class.new(Schema) { include(relations) }
@@ -26,9 +26,9 @@ module Ramom
 
       private
 
-      def base_relations
-        @base_relations.each_with_object({}) { |(name, relation), relations|
-          relations[name] = Axiom::Relation::Gateway.new(adapter, relation)
+      def base_relations(relations)
+        relations.each_with_object({}) { |(name, relation), h|
+          h[name] = Axiom::Relation::Gateway.new(adapter, relation)
         }
       end
     end # Builder

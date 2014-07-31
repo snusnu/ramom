@@ -13,24 +13,26 @@ module Ramom
       end
 
       def register(name, options, &block)
-        dresser = dressers[options.fetch(:dresser)]
-        op      = operation.new(name, environment, dresser)
+        op = operation.new(name, environment, dresser(options))
 
         # We basically use the op instance as the context
         # to evaluate the function given as &block. This
         # is probably a bit unusual for typical OO, it is
         # however perfectly valid ruby, and simply another
         # way of doing (prototype oriented) functional OOP
-
-        (class << op; self end).class_eval {
-          define_method(:call, &block)
-        }
+        op.define_singleton_method(:call, &block)
 
         @operations[name] = op
       end
 
       def fetch(*args, &block)
         @operations.fetch(*args, &block)
+      end
+
+      private
+
+      def dresser(options)
+        dressers[options.fetch(:dresser)]
       end
     end # Registry
   end # Operation

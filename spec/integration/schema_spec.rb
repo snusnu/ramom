@@ -105,9 +105,12 @@ Instruction.create(
 
 puts
 
+models = DataMapper::Model.descendants # needed a few times
+
 # (2) Initialize a new Ramom::Schema
 
-schema_definition = Ramom::DM.schema_definition(DataMapper::Model.descendants) do
+# Registers base relations for all +models+
+schema_definition = Ramom::DM.schema_definition(models) do
 
   external :dashboard do |company_id, employment_id|
     with_page_info(
@@ -150,7 +153,8 @@ schema_definition = Ramom::DM.schema_definition(DataMapper::Model.descendants) d
 
 end
 
-#
+# (3) Generate mom dressers for all (desired) relations
+
 # Passing a whitelist of base relation names to generate
 # dressers from is supported. If an empty array is given,
 # dressers for all base relations are generated.
@@ -164,7 +168,7 @@ end
 # Since we only need a dresser for the :employments base
 # relation in the specs below, we won't bother generating
 # others.
-#
+
 names = [
   :employments
 ].freeze
@@ -203,12 +207,7 @@ end
 INPUT_DRESSERS  = {} # TODO add some
 OUTPUT_DRESSERS = Mom.object_mappers(dressers)
 
-adapter  = Axiom::Adapter::DataObjects.new(uri)
-schema   = Ramom::Schema.build(adapter, schema_definition)
-writer   = Ramom::DM::Writer.build(DataMapper::Model.descendants)
-database = Ramom::Database.new(schema, writer)
-
-OP_ENV = Ramom::Operation::Environment.new(database: database)
+OP_ENV = Ramom::DM.operation_environment(uri, schema_definition, models)
 
 class C
   include Ramom.command(INPUT_DRESSERS, OP_ENV, self)
@@ -227,14 +226,14 @@ Q.register :dashboard, dresser: :dashboard do |params|
 end
 
 describe 'ramom' do
-  let(:db) { Ramom::Facade.build(C, Q) }
+  let(:db) { Ramom::Facade.build(C, Q, OP_ENV) }
 
   it 'does allow to call external relations directly' do
-    expect { schema.dashboard(1, 1) }.to_not raise_error
+    expect { db.schema.dashboard(1, 1) }.to_not raise_error
   end
 
   it 'does not allow to call internal relations directly' do
-    expect { schema.employees(1) }.to raise_error(NoMethodError)
+    expect { db.schema.employees(1) }.to raise_error(NoMethodError)
   end
 
   it 'supports reading dressed base relations' do

@@ -15,6 +15,15 @@ module Ramom
       }
     end
 
+    def self.operation_environment(uri, schema_definition, models)
+      adapter  = Axiom::Adapter::DataObjects.new(uri)
+      schema   = Ramom::Schema.build(adapter, schema_definition)
+      writer   = Ramom::DM::Writer.build(models)
+      database = Ramom::Database.new(schema, writer)
+
+      Operation::Environment.new(database: database)
+    end
+
   end # DM
 end # Ramom
 

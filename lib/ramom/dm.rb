@@ -3,6 +3,10 @@
 module Ramom
   module DM
 
+    def self.schema_definition(models, &block)
+      Ramom::Schema.define(schema_definition_options(models), &block)
+    end
+
     def self.schema_definition_options(models)
       dm_definition = Schema::Definition::Builder.call(models)
       {

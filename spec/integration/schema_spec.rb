@@ -107,10 +107,7 @@ puts
 
 # (2) Initialize a new Ramom::Schema
 
-models  = DataMapper::Model.descendants
-options = Ramom::DM.schema_definition_options(models)
-
-schema_definition = Ramom::Schema.define(options) do
+schema_definition = Ramom::DM.schema_definition(DataMapper::Model.descendants) do
 
   external :dashboard do |company_id, employment_id|
     with_page_info(

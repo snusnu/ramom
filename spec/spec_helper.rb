@@ -19,8 +19,7 @@ end
 
 require 'ramom'
 
-# MUST happen after ice_nine
-# got required by substation
+# MUST happen after require 'ice_nine'
 require 'devtools/spec_helper'
 
 RSpec.configure do |config|

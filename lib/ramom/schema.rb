@@ -70,6 +70,10 @@ module Ramom
         }
       end
 
+      def fk_wrapped_rel(name)
+        FKWrapper.call(name, call(name), @fk_constraints)
+      end
+
       private
 
       def attr_names(relation)

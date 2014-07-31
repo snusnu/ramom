@@ -10,6 +10,7 @@ module Ramom
 
         def initialize(schema_definition, definition_registry, relation_names = EMPTY_ARRAY)
           super
+          @fk_constraints = schema_definition.fk_constraints
         end
 
         def call
@@ -20,13 +21,27 @@ module Ramom
             attr_names  = base_relation.header.map(&:name)
             attributes  = attributes_hash(mapper_name, attr_names)
 
+            fk_set        = fk_constraints.fetch(name)
+            fk_attr_names = Schema::FKConstraint::Set.fk_attributes(fk_set).to_a
+
             definition_registry.register(mapper_name) do
-              attr_names.each { |attr_name| map(attributes.fetch(attr_name)) }
+              fk_set.each do |fk|
+                wrap(::Mom.singularize(fk.target)) do
+                  fk.source_attributes.each do |attr_name|
+                    map(::Mom.mapped_name(attr_name, fk.target))
+                  end
+                end
+              end
+              (attr_names - fk_attr_names).each do |attr_name|
+                map(attributes.fetch(attr_name))
+              end
             end
           end
         end
 
         private
+
+        attr_reader :fk_constraints
 
         def build?(relation_name)
           relation_names.empty? || relation_names.include?(relation_name)
@@ -34,15 +49,10 @@ module Ramom
 
         def attributes_hash(mapper_name, attr_names)
           attr_names.each_with_object({}) { |name, h|
-            h[name] = mapped_name(name, mapper_name)
+            h[name] = ::Mom.mapped_name(name, mapper_name)
           }
         end
-
-        def mapped_name(attr_name, mapper_name)
-          prefix = "#{::Mom.singularize(mapper_name)}_"
-          attr_name.to_s.sub(prefix, EMPTY_STRING).to_sym
-        end
-      end # EntityBuilder
+      end # Registrar
     end # Definition
   end # Mom
 end # Ramom

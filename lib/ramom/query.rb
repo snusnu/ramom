@@ -21,5 +21,9 @@ module Ramom
 
     alias_method :rel, :relation
 
+    def fk_wrapped_rel(relation)
+      db.fk_wrapped_rel(relation)
+    end
+
   end # Query
 end # Ramom

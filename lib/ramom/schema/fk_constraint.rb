@@ -21,11 +21,22 @@ module Ramom
           constraints[source] << FKConstraint.new(source, target, mapping)
         end
 
+        def fetch(source)
+          constraints.fetch(source, EMPTY)
+        end
+
         def source_attributes
           constraints.reduce({}) { |h, (source_name, fkc_set)|
             h.merge(source_name => self.class.fk_attributes(fkc_set))
           }
         end
+
+        def empty?
+          constraints.empty?
+        end
+
+        EMPTY = new.freeze # an empty null object instance
+
       end # Set
 
       include Concord::Public.new(:source, :target, :mapping)

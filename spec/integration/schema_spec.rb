@@ -220,8 +220,8 @@ class Q
   include Ramom.query(OUTPUT_DRESSERS, OP_ENV, self)
 end
 
-Q.register :people, dresser: :person do
-  read(rel(:people))
+Q.register :employments, dresser: :employment do
+  read(fk_wrapped_rel(:employments))
 end
 
 Q.register :dashboard, dresser: :dashboard do |params|
@@ -240,9 +240,10 @@ describe 'ramom' do
   end
 
   it 'supports reading dressed base relations' do
-    db.read(:people).each_with_index do |person, i|
-      expect(person.id).to_not be(nil)
-      expect(person.name).to eq("person #{i+1}")
+    db.read(:employments).each_with_index do |employment, i|
+      expect(employment.id).to_not be(nil)
+      expect(employment.company.id).to_not be(nil)
+      expect(employment.person.id).to_not be(nil)
     end
   end
 

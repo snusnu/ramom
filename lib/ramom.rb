@@ -41,6 +41,7 @@ end # Ramom
 require 'ramom/version'
 require 'ramom/relation/builder'
 require 'ramom/schema/fk_constraint'
+require 'ramom/schema/fk_wrapper'
 require 'ramom/schema/definition'
 require 'ramom/schema/definition/context'
 require 'ramom/schema/definition/compiler'

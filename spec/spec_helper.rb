@@ -22,6 +22,14 @@ require 'ramom'
 # MUST happen after require 'ice_nine'
 require 'devtools/spec_helper'
 
+# Respect TZ but default to UTC
+#
+# DM/DO require a timezone to be
+# specified explicitly in order
+# to guarantee reading with the
+# same TZ used when writing
+ENV['TZ'] = ENV.fetch('TZ', 'UTC')
+
 RSpec.configure do |config|
   config.expect_with :rspec do |c|
     c.syntax = :expect

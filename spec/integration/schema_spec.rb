@@ -13,7 +13,6 @@ require 'ramom/mom'
 
 require 'axiom-do-adapter'
 
-ENV['TZ'] = 'UTC'     # VERY IMPORTANT
 Axiom::Types.finalize # VERY IMPORTANT
 
 # (1) Setup and define tables with DataMapper

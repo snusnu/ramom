@@ -37,6 +37,7 @@ module Ramom
               end
             end
           end
+          definition_registry
         end
 
         private

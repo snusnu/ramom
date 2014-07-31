@@ -150,8 +150,26 @@ schema_definition = Ramom::DM.schema_definition(DataMapper::Model.descendants) d
 
 end
 
-options  = Ramom::Mom.definition_options(schema_definition)
-dressers = Mom::Definition::Registry.build(options) do
+#
+# Passing a whitelist of base relation names to generate
+# dressers from is supported. If an empty array is given,
+# dressers for all base relations are generated.
+#
+# This is useful for automatically generating dressers
+# that are used for dressing base relation tuples that
+# get returned from successful write operations. Most
+# of the time, not all base relations need respective
+# dressers.
+#
+# Since we only need a dresser for the :employments base
+# relation in the specs below, we won't bother generating
+# others.
+#
+names = [
+  :employments
+].freeze
+
+dressers = Ramom::Mom.definition_registry(schema_definition, names) do
 
   register :page_info, prefix: false do
     map :number
@@ -181,23 +199,6 @@ dressers = Mom::Definition::Registry.build(options) do
     end
   end
 end
-
-# This mutates +dressers+ and adds base relation mappers
-Ramom::Mom.register_base_relation_definitions(schema_definition, dressers)#, [
-#
-# Passing a whitelist of base relation names to generate
-# mappers from is also supported. If no relation names
-# are given, mappers for all base relations are generated.
-#
-# This is useful for automatically generating mappers
-# that are used for mapping base relation tuples that
-# get returned from successful write operations. Most
-# of the time, not all base relations need respective
-# mappers.
-#
-#  :people,
-#  :employments,
-#])
 
 INPUT_DRESSERS  = {} # TODO add some
 OUTPUT_DRESSERS = Mom.object_mappers(dressers)

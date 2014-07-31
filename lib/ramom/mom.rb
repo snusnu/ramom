@@ -3,15 +3,17 @@
 module Ramom
   module Mom
 
+    def self.definition_registry(schema_definition, names = EMPTY_ARRAY, &block)
+      options  = definition_options(schema_definition)
+      registry = ::Mom.definition_registry(options, &block)
+      Definition::Registrar.call(schema_definition, registry, names)
+    end
+
     def self.definition_options(schema_definition)
       {
         guard:          false,
         name_generator: Naming::NaturalJoin.new(schema_definition.fk_mapping)
       }
-    end
-
-    def self.register_base_relation_definitions(schema_definition, definition_registry, names = EMPTY_ARRAY)
-      Definition::Registrar.call(schema_definition, definition_registry, names)
     end
 
     def self.attribute_name(prefixed_name, relation_name)

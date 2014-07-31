@@ -28,7 +28,7 @@ module Ramom
               fk_set.each do |fk|
                 wrap(::Mom.singularize(fk.target)) do
                   fk.source_attributes.each do |attr_name|
-                    map(::Mom.mapped_name(attr_name, fk.target))
+                    map(Mom.attribute_name(attr_name, fk.target))
                   end
                 end
               end
@@ -49,7 +49,7 @@ module Ramom
 
         def attributes_hash(mapper_name, attr_names)
           attr_names.each_with_object({}) { |name, h|
-            h[name] = ::Mom.mapped_name(name, mapper_name)
+            h[name] = Mom.attribute_name(name, mapper_name)
           }
         end
       end # Registrar

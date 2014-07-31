@@ -28,6 +28,8 @@ module Ramom
   # An empty frozen array
   EMPTY_ARRAY = [].freeze
 
+  UNDERSCORE = '_'.freeze
+
   def self.command(*args)
     Command.registrar(*args)
   end

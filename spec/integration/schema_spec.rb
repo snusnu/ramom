@@ -156,10 +156,10 @@ end
 options  = Ramom::Mom.definition_options(schema_definition)
 dressers = Mom::Definition::Registry.build(options) do
 
-  register :page_info do
-    map :number, from: :number
-    map :limit , from: :limit
-    map :total , from: :total
+  register :page_info, prefix: false do
+    map :number
+    map :limit
+    map :total
   end
 
   register :dashboard do

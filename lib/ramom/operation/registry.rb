@@ -20,6 +20,11 @@ module Ramom
         # is probably a bit unusual for typical OO, it is
         # however perfectly valid ruby, and simply another
         # way of doing (prototype oriented) functional OOP
+        #
+        # Since this code gets executed ONCE at application
+        # boot time, none of the common performance overhead
+        # concerns should apply.
+
         op.define_singleton_method(:call, &block)
 
         @operations[name] = op

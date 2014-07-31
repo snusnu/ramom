@@ -8,7 +8,13 @@ module Ramom
     end
 
     def self.build(adapter, definition, base = self, *args)
-      Builder.call(adapter, definition, base).new(*args)
+      Builder.call(adapter, definition, base, *args)
+    end
+
+    def initialize(definition)
+      @base_relations    = definition.base_relations
+      @virtual_relations = definition.virtual_relations
+      @fk_constraints    = definition.fk_constraints
     end
 
     module API

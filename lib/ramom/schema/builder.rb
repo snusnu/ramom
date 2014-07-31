@@ -4,6 +4,10 @@ module Ramom
   class Schema < BasicObject
     class Builder
 
+      def self.call(adapter, definition, base = self, *args)
+        new(adapter, definition, base).call(*args)
+      end
+
       include Concord.new(:adapter, :definition, :base)
       include Procto.call
 
@@ -13,14 +17,14 @@ module Ramom
         @virtual_relations = definition.virtual_relations
       end
 
-      def call
+      def call(*args)
         relations = Module.new
 
         # Compile relation access methods onto +relations+ lvar
         Definition::Compiler::Base.call(@base_relations, relations)
         Definition::Compiler::Virtual.call(@virtual_relations, relations)
 
-        Class.new(base) { include(relations) }
+        Class.new(base) { include(relations) }.new(definition, *args)
       end
 
       private

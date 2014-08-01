@@ -9,7 +9,6 @@ module Ramom
       end
 
       include Concord.new(:adapter, :definition, :base)
-      include Procto.call
 
       def initialize(*)
         super

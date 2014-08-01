@@ -32,8 +32,7 @@ module Ramom
               name_generator = Naming::NaturalJoin.new(fk_attributes)
 
               source_name    = relation_name(model)
-              relation       = relation_builder.call(model, name_generator)
-              h[source_name] = relation
+              h[source_name] = Relation::Builder.call(model, name_generator)
             }
           end
 
@@ -61,10 +60,6 @@ module Ramom
 
           def key_attributes(key)
             key.map { |property| property.field.to_sym }
-          end
-
-          def relation_builder
-            Relation::Builder
           end
         end # Builder
       end # Definition

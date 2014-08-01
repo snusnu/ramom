@@ -22,12 +22,12 @@ module Ramom
       dresser.call(attributes)
     end
 
-    def success(data)
-      Result::Success.new(data)
+    def success(object)
+      Orc::Result.success(object)
     end
 
-    def failure(data)
-      Result::Failure.new(data)
+    def failure(status, context)
+      Orc::Result.failure(status, context)
     end
   end # Operation
 end # Ramom

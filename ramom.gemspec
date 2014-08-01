@@ -35,5 +35,5 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'dm-core',             '~> 1.2', '>= 1.2.0'
   gem.add_development_dependency 'dm-migrations',       '~> 1.2', '>= 1.2.0'
   gem.add_development_dependency 'dm-postgres-adapter', '~> 1.2', '>= 1.2.0'
-  gem.add_development_dependency 'rspec',               '~> 3.0'  '>= 3.0.0'
+  gem.add_development_dependency 'rspec',               '~> 3.0', '>= 3.0.0'
 end

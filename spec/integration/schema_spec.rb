@@ -238,7 +238,7 @@ describe 'ramom' do
   end
 
   it 'does not allow to call internal relations directly' do
-    expect { db.schema.employees(1) }.to raise_error(NoMethodError)
+    expect { db.schema.employees(1) }.to raise_error(NoMethodError, /employees/)
   end
 
   it 'supports reading dressed base relations' do

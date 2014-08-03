@@ -204,8 +204,8 @@ dressers = Ramom::Mom.definition_registry(schema_definition, names) do
 end
 
 OP_ENV = Ramom::DM.environment(
-  definition: schema_definition,
   models:     models,
+  definition: schema_definition,
   dressers:   Mom.object_mappers(dressers),
   adapters: {
     postgres: Axiom::Adapter::DataObjects.new(uri)

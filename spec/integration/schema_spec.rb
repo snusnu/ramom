@@ -206,7 +206,7 @@ end
 INPUT_DRESSERS  = {} # TODO add some
 OUTPUT_DRESSERS = Mom.object_mappers(dressers)
 
-OP_ENV = Ramom::DM.operation_environment(
+OP_ENV = Ramom::DM.environment(
   definition: schema_definition,
   models:     models,
   adapters: {

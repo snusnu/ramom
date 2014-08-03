@@ -7,7 +7,7 @@ module Ramom
       Schema::Definition::Builder.call(models, &block)
     end
 
-    def self.operation_environment(options)
+    def self.environment(options)
       schema = Ramom::Schema.build(options.reject { |k| k.equal?(:models) })
       writer = Ramom::DM::Writer.build(options.fetch(:models))
 

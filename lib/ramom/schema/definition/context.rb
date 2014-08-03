@@ -17,6 +17,10 @@ module Ramom
               relation = Axiom::Relation::Gateway.new(adapter, body.call)
               update(body: ->() { relation })
             end
+
+            def attr_names
+              Set.new(body.call.header.map(&:name))
+            end
           end # Base
         end # Relation
 

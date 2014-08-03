@@ -4,11 +4,12 @@ module Ramom
   module Operation
 
     class Registry
-      include Concord.new(:dressers, :environment, :operation)
+      include Concord.new(:environment, :operation)
       include Lupo.enumerable(:operations)
 
       def initialize(*args)
         super
+        @dressers   = environment.dressers
         @operations = {}
       end
 
@@ -37,7 +38,7 @@ module Ramom
       private
 
       def dresser(options)
-        dressers[options.fetch(:dresser)]
+        @dressers[options.fetch(:dresser)]
       end
     end # Registry
   end # Operation

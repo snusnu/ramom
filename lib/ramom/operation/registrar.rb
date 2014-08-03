@@ -19,8 +19,8 @@ module Ramom
 
       include Concord.new(:registry, :kind)
 
-      def self.build(kind, dressers, environment, operation)
-        new(Registry.new(dressers, environment, operation), kind)
+      def self.build(kind, environment, operation)
+        new(Registry.new(environment, operation), kind)
       end
 
       private

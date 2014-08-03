@@ -3,16 +3,22 @@
 module Ramom
   module DM
 
+    REJECT_FOR_SCHEMA_BUILDER = [:models, :dressers].freeze
+
     def self.schema_definition(models, &block)
       Schema::Definition::Builder.call(models, &block)
     end
 
     def self.environment(options)
-      schema = Ramom::Schema.build(options.reject { |k| k.equal?(:models) })
+      schema = Ramom::Schema.build(options.reject { |k|
+        REJECT_FOR_SCHEMA_BUILDER.include?(k)
+      })
+
       writer = Ramom::DM::Writer.build(options.fetch(:models))
 
       Operation::Environment.new(
-        database: Ramom::Database.new(schema, writer)
+        database: Ramom::Database.new(schema, writer),
+        dressers: options.fetch(:dressers)
       )
     end
 

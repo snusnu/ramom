@@ -203,23 +203,21 @@ dressers = Ramom::Mom.definition_registry(schema_definition, names) do
   end
 end
 
-INPUT_DRESSERS  = {} # TODO add some
-OUTPUT_DRESSERS = Mom.object_mappers(dressers)
-
 OP_ENV = Ramom::DM.environment(
   definition: schema_definition,
   models:     models,
+  dressers:   Mom.object_mappers(dressers),
   adapters: {
     postgres: Axiom::Adapter::DataObjects.new(uri)
   }
 )
 
 class C
-  include Ramom.command(INPUT_DRESSERS, OP_ENV, self)
+  include Ramom.command(OP_ENV, self)
 end
 
 class Q
-  include Ramom.query(OUTPUT_DRESSERS, OP_ENV, self)
+  include Ramom.query(OP_ENV, self)
 end
 
 Q.register :employments, dresser: :employment do

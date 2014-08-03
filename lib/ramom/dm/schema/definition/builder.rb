@@ -33,35 +33,35 @@ module Ramom
 
           def infer_base_relations
             models.each_with_object({}) { |model, h|
-              add_fk_constraints(model)
 
-              fk_attributes  = context.fk_constraints.source_attributes
-              name_generator = Naming::NaturalJoin.new(fk_attributes)
+              fk_attributes = Set.new
+              with_fk_constraints(model) do |source_name, target_name, mapping|
+                context.fk_constraint(source_name, target_name, mapping)
+                fk_attributes.merge(mapping.keys)
+              end
 
-              name     = relation_name(model)
-              options  = {adapter: self.class.adapter(model), visibility: :public}
-              relation = Relation::Builder.call(model, name_generator)
+              name           = relation_name(model)
+              name_generator = Naming::NaturalJoin.new(name => fk_attributes)
+              base_relation  = Relation::Builder.call(model, name_generator)
 
-              context.base_relation(name, options) { relation }
+              options = {adapter: self.class.adapter(model), visibility: :public}
+
+              context.base_relation(name, options) { base_relation }
             }
           end
 
-          def add_fk_constraints(model)
+          def with_fk_constraints(model)
             model.relationships.each do |relationship|
               if relationship.respond_to?(:required?) # M:1
-                add_fk_constraint(relationship)
+                source_name = relation_name(relationship.source_model)
+                target_name = relation_name(relationship.target_model)
+                source_key  = key_attributes(relationship.source_key)
+                target_key  = key_attributes(relationship.target_key)
+                mapping     = Hash[source_key.zip(target_key)]
+
+                yield(source_name, target_name, mapping)
               end
             end
-          end
-
-          def add_fk_constraint(relationship)
-            source_name = relation_name(relationship.source_model)
-            target_name = relation_name(relationship.target_model)
-            source_key  = key_attributes(relationship.source_key)
-            target_key  = key_attributes(relationship.target_key)
-            mapping     = Hash[source_key.zip(target_key)]
-
-            context.fk_constraint(source_name, target_name, mapping)
           end
 
           def relation_name(model)

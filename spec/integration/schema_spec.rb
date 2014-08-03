@@ -206,7 +206,13 @@ end
 INPUT_DRESSERS  = {} # TODO add some
 OUTPUT_DRESSERS = Mom.object_mappers(dressers)
 
-OP_ENV = Ramom::DM.operation_environment(uri, schema_definition, models)
+OP_ENV = Ramom::DM.operation_environment(
+  definition: schema_definition,
+  models:     models,
+  adapters: {
+    postgres: Axiom::Adapter::DataObjects.new(uri)
+  }
+)
 
 class C
   include Ramom.command(INPUT_DRESSERS, OP_ENV, self)

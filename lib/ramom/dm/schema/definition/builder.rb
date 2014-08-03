@@ -7,32 +7,42 @@ module Ramom
 
         class Builder
 
-          include Concord.new(:models, :fk_constraints)
-          include Procto.call
+          DM_ADAPTER_KEY = 'adapter'.freeze
 
-          # This object mutates the injected +fk_constraints+
-          def initialize(models, fk_constraints = Ramom::Schema::FKConstraint::Set.new)
-            super
+          def self.adapter(model)
+            model.repository.adapter.options[DM_ADAPTER_KEY].to_sym
           end
 
-          def call
-            {
-              base_relations: base_relations,
-              fk_constraints: fk_constraints
-            }
+          include Concord.new(:models, :context)
+
+          def self.call(models, &block)
+            new(models).call(&block)
+          end
+
+          # This object mutates the injected +context+
+          def initialize(_, context = Ramom::Schema::Definition::Context.new)
+            super
+            infer_base_relations
+          end
+
+          def call(&block)
+            Ramom::Schema::Definition.new(context.call(&block))
           end
 
           private
 
-          def base_relations
+          def infer_base_relations
             models.each_with_object({}) { |model, h|
               add_fk_constraints(model)
 
-              fk_attributes  = fk_constraints.source_attributes
+              fk_attributes  = context.fk_constraints.source_attributes
               name_generator = Naming::NaturalJoin.new(fk_attributes)
 
-              source_name    = relation_name(model)
-              h[source_name] = Relation::Builder.call(model, name_generator)
+              name     = relation_name(model)
+              options  = {adapter: self.class.adapter(model), visibility: :public}
+              relation = Relation::Builder.call(model, name_generator)
+
+              context.base_relation(name, options) { relation }
             }
           end
 
@@ -51,7 +61,7 @@ module Ramom
             target_key  = key_attributes(relationship.target_key)
             mapping     = Hash[source_key.zip(target_key)]
 
-            fk_constraints.add(source_name, target_name, mapping)
+            context.fk_constraint(source_name, target_name, mapping)
           end
 
           def relation_name(model)

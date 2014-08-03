@@ -4,7 +4,7 @@ module Ramom
   module DM
 
     def self.schema_definition(models, &block)
-      Ramom::Schema.define(schema_definition_options(models), &block)
+      Schema::Definition::Builder.call(models, &block)
     end
 
     def self.schema_definition_options(models)
@@ -15,13 +15,13 @@ module Ramom
       }
     end
 
-    def self.operation_environment(uri, schema_definition, models)
-      adapter  = Axiom::Adapter::DataObjects.new(uri)
-      schema   = Ramom::Schema.build(adapter, schema_definition)
-      writer   = Ramom::DM::Writer.build(models)
-      database = Ramom::Database.new(schema, writer)
+    def self.operation_environment(options)
+      schema = Ramom::Schema.build(options.reject { |k| k.equal?(:models) })
+      writer = Ramom::DM::Writer.build(options.fetch(:models))
 
-      Operation::Environment.new(database: database)
+      Operation::Environment.new(
+        database: Ramom::Database.new(schema, writer)
+      )
     end
 
   end # DM

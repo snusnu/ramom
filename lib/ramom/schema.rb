@@ -7,8 +7,8 @@ module Ramom
       Definition.build(options, &block)
     end
 
-    def self.build(adapter, definition, base = self, *args)
-      Builder.call(adapter, definition, base, *args)
+    def self.build(options, *args)
+      Builder.call(options, *args)
     end
 
     def initialize(definition)

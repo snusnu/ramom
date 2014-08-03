@@ -7,20 +7,44 @@ module Ramom
       class Context
 
         class Relation
-          include Concord::Public.new(:name, :visibility, :body)
+          include Anima.new(:name, :visibility, :body)
+
+          class Base < self
+            include anima.add(:adapter)
+            include Anima::Update
+
+            def gateway(adapter)
+              relation = Axiom::Relation::Gateway.new(adapter, body.call)
+              update(body: ->() { relation })
+            end
+          end # Base
         end # Relation
+
+        DEFAULT_ATTRIBUTES = {
+          base:           {},
+          virtual:        {},
+          fk_constraints: FKConstraint::Set.new
+        }.freeze
 
         include Anima.new(:base, :virtual, :fk_constraints)
 
-        def initialize(attributes, &block)
+        def initialize(attributes = DEFAULT_ATTRIBUTES, &block)
           super(attributes.dup)
-          instance_eval(&block)
+          call(&block) if block
         end
 
-        private
+        def call(&block)
+          instance_eval(&block)
+          self
+        end
 
-        def base_relation(name, &block)
-          raise NotImplementedError
+        def base_relation(name, options, &block)
+          base[name] = Relation::Base.new(
+            name:       name,
+            visibility: options.fetch(:visibility, :public),
+            adapter:    options.fetch(:adapter),
+            body:       block
+          )
         end
 
         def fk_constraint(source, target, mapping)
@@ -36,7 +60,11 @@ module Ramom
         end
 
         def relation(name, visibility, &block)
-          virtual[name] = Relation.new(name, visibility, block)
+          virtual[name] = Relation.new(
+            name:       name,
+            visibility: visibility,
+            body:       block
+          )
         end
       end # Context
     end # Definition

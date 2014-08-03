@@ -18,7 +18,7 @@ module Ramom
             next unless build?(name)
 
             mapper_name = ::Mom.singularize(name)
-            attr_names  = base_relation.header.map(&:name)
+            attr_names  = base_relation.body.call.header.map(&:name)
             attributes  = attributes_hash(mapper_name, attr_names)
 
             fk_set        = fk_constraints.fetch(name)

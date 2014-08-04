@@ -86,28 +86,28 @@ module Ramom
 
       alias_method :h, :attr_names
 
-      def to_s
-        "#<Ramom::Schema(BasicObject):#{__id__}>"
-      end
-
-      def puts(*args)
-        ::Kernel.puts(*args)
-      end
-
-      def pp(*args)
-        ::Kernel.pp(*args)
-      end
-
-      def fail(*args)
-        ::Kernel.fail(*args)
-      end
-
-      def raise(*args)
-        ::Kernel.raise(*args)
-      end
     end # API
 
     include API
 
+    def to_s
+      "#<Ramom::Schema(BasicObject):#{__id__}>"
+    end
+
+    def puts(*args)
+      ::Kernel.puts(*args)
+    end
+
+    def pp(*args)
+      ::Kernel.pp(*args)
+    end
+
+    def fail(*args)
+      ::Kernel.fail(*args)
+    end
+
+    def raise(*args)
+      ::Kernel.raise(*args)
+    end
   end # Schema
 end # Ramom

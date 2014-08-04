@@ -15,6 +15,7 @@ module Ramom
         name_generator: Naming::NaturalJoin.new(schema_definition.fk_mapping)
       }
     end
+    private_class_method :definition_options
 
     def self.attribute_name(prefixed_name, relation_name)
       prefix = "#{::Mom.singularize(relation_name)}_"

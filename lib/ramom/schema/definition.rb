@@ -38,8 +38,7 @@ module Ramom
       end
 
       def relation?(name, include_private = false)
-        cache = include_private ? relations : @public_relations
-        cache.key?(name)
+        (include_private ? relations : @public_relations).key?(name)
       end
 
       private

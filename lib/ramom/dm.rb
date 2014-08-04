@@ -14,7 +14,7 @@ module Ramom
         REJECT_FOR_SCHEMA_BUILDER.include?(k)
       })
 
-      writer = Ramom::DM::Writer.build(options.fetch(:models))
+      writer = Writer.build(options.fetch(:models))
 
       Operation::Environment.new(
         database: Database.new(schema, writer),

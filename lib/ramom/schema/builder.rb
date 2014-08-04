@@ -16,25 +16,25 @@ module Ramom
         :base
       )
 
+      private :adapters, :definition, :base
+
       def initialize(_)
         super
-        base_relations    = base_relations(definition.base_relations)
-        virtual_relations = definition.virtual_relations
-
-        @relations = base_relations.merge(virtual_relations)
+        @relations = schema_relations
       end
 
       def call(*args)
-        relations = compile(Module.new)
-        Class.new(base) { include(relations) }.new(definition, *args)
+        relation_access = compile(Module.new)
+
+        Class.new(base) {
+          include relation_access
+        }.new(definition, *args)
       end
 
       private
 
-      attr_reader :relations
-
       def compile(container)
-        container.instance_exec(relations) do |relations|
+        container.instance_exec(@relations) do |relations|
           relations.each do |(name, relation)|
             define_method(name, &relation.body)
             send(relation.visibility, name)
@@ -43,10 +43,10 @@ module Ramom
         container
       end
 
-      def base_relations(relations)
-        relations.each_with_object({}) { |(name, relation), h|
+      def schema_relations
+        definition.base_relations.each_with_object({}) { |(name, relation), h|
           h[name] = relation.gateway(adapter(relation))
-        }
+        }.merge(definition.virtual_relations)
       end
 
       def adapter(relation)

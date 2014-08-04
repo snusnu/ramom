@@ -9,12 +9,12 @@ module Ramom
       Schema::Definition::Builder.call(models, &block)
     end
 
-    def self.environment(options)
+    def self.environment(options, &block)
       schema = Ramom::Schema.build(options.reject { |k|
         REJECT_FOR_SCHEMA_BUILDER.include?(k)
       })
 
-      writer = Writer.build(options.fetch(:models))
+      writer = Writer.build(options.fetch(:models), &block)
 
       Operation::Environment.new(
         database: Database.new(schema, writer),

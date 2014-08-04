@@ -13,14 +13,11 @@ if ENV['COVERAGE'] == 'true'
     command_name     'spec:unit'
     add_filter       'config'
     add_filter       'spec'
-    minimum_coverage 100
+    minimum_coverage 90.79
   end
 end
 
 require 'ramom'
-
-# MUST happen after require 'ice_nine'
-require 'devtools/spec_helper'
 
 # Respect TZ but default to UTC
 #

@@ -28,6 +28,12 @@ module Ramom
           end # Base
         end # Relation
 
+        class AlreadyRegistered < StandardError
+          def initialize(name)
+            super("The relation #{name.inspect} is already registered")
+          end
+        end # AlreadyRegistered
+
         DEFAULT_ATTRIBUTES = {
           base:           {},
           virtual:        {},
@@ -47,6 +53,8 @@ module Ramom
         end
 
         def base_relation(name, options, &block)
+          assert_not_already_registered(name, base)
+
           base[name] = Relation::Base.new(
             name:       name,
             visibility: options.fetch(:visibility, :public),
@@ -68,11 +76,19 @@ module Ramom
         end
 
         def relation(name, visibility, &block)
+          assert_not_already_registered(name, virtual)
+
           virtual[name] = Relation.new(
             name:       name,
             visibility: visibility,
             body:       block
           )
+        end
+
+        private
+
+        def assert_not_already_registered(name, relations)
+          fail(AlreadyRegistered.new(name)) if relations.key?(name)
         end
       end # Context
     end # Definition

@@ -32,10 +32,14 @@ module Ramom
         @fk_constraints    = context.fk_constraints
         @fk_attributes     = fk_constraints.source_attributes
         @fk_mapping        = initialize_fk_mapping
+
+        # Cache these because Schema#call relies on #relation?
+        @public_relations  = initialize_public_relation_cache
       end
 
-      def external?(name)
-        relations.fetch(name).external?
+      def relation?(name, include_private = false)
+        cache = include_private ? relations : @public_relations
+        cache.key?(name)
       end
 
       private
@@ -43,6 +47,12 @@ module Ramom
       def initialize_fk_mapping
         fk_attributes.each_with_object({}) { |(source_name, attrs), h|
           h[Inflecto.singularize(source_name.to_s).to_sym] = attrs
+        }
+      end
+
+      def initialize_public_relation_cache
+        @relations.each_with_object({}) { |(name, relation), h|
+          h[name] = relation if relation.external?
         }
       end
     end # Definition

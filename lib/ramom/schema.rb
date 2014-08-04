@@ -20,14 +20,6 @@ module Ramom
 
     module API
 
-      def call(name, *args, &block)
-        if @definition.external?(name)
-          __send__(name, *args, &block).optimize
-        else
-          fail NoMethodError, "private method `#{name}' called for #{self}"
-        end
-      end
-
       # Useful relational operators not present in axiom
 
       def allbut(relation, attribute_names)
@@ -89,6 +81,20 @@ module Ramom
     end # API
 
     include API
+
+    def public_send(name, *args, &block)
+      if @definition.relation?(name)
+        __send__(name, *args, &block).optimize
+      else
+        fail ::NoMethodError, "private method `#{name}' called for #{self}"
+      end
+    end
+
+    alias_method :call, :public_send
+
+    def respond_to?(name, include_private = false)
+      @definition.relation?(name, include_private)
+    end
 
     def to_s
       "#<Ramom::Schema(BasicObject):#{__id__}>"

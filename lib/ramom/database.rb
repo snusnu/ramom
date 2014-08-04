@@ -2,22 +2,18 @@
 
 module Ramom
   class Database
-    include Concord::Public.new(:schema, :writer)
-
-    def transaction(repository = :default, &block)
-      writer.transaction(repository, &block)
-    end
+    include Concord::Public.new(:schema)
 
     def insert(relation, tuples)
-      writer.insert(relation, tuples)
+      relation.insert(relation, tuples)
     end
 
     def update(relation, tuples)
-      writer.update(relation, tuples)
+      relation.update(relation, tuples)
     end
 
     def delete(relation, tuples)
-      writer.delete(relation, tuples)
+      relation.delete(relation, tuples)
     end
 
     def relation(name, *args)

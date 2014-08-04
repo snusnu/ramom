@@ -17,7 +17,7 @@ module Ramom
       writer = Ramom::DM::Writer.build(options.fetch(:models))
 
       Operation::Environment.new(
-        database: Ramom::Database.new(schema, writer),
+        database: Database.new(schema, writer),
         dressers: options.fetch(:dressers)
       )
     end
@@ -28,3 +28,4 @@ end # Ramom
 require 'ramom/dm/relation/builder'
 require 'ramom/dm/schema/definition/builder'
 require 'ramom/dm/writer'
+require 'ramom/dm/database'

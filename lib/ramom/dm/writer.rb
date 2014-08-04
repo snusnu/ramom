@@ -3,7 +3,7 @@
 module Ramom
   module DM
 
-    class Writer < Ramom::Writer
+    class Writer
 
       class Backend
 

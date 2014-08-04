@@ -12,16 +12,20 @@ module Ramom
     end
 
     def initialize(definition)
-      @base_relations    = definition.base_relations
-      @virtual_relations = definition.virtual_relations
-      @fk_constraints    = definition.fk_constraints
+      @definition        = definition
+      @base_relations    = @definition.base_relations
+      @virtual_relations = @definition.virtual_relations
+      @fk_constraints    = @definition.fk_constraints
     end
 
     module API
 
-      # TODO only allow to call external relations
       def call(name, *args, &block)
-        __send__(name, *args, &block).optimize
+        if @definition.external?(name)
+          __send__(name, *args, &block).optimize
+        else
+          fail NoMethodError, "private method `#{name}' called for #{self}"
+        end
       end
 
       # Useful relational operators not present in axiom
@@ -82,12 +86,24 @@ module Ramom
 
       alias_method :h, :attr_names
 
+      def to_s
+        "#<Ramom::Schema(BasicObject):#{__id__}>"
+      end
+
       def puts(*args)
         ::Kernel.puts(*args)
       end
 
       def pp(*args)
         ::Kernel.pp(*args)
+      end
+
+      def fail(*args)
+        ::Kernel.fail(*args)
+      end
+
+      def raise(*args)
+        ::Kernel.raise(*args)
       end
     end # API
 

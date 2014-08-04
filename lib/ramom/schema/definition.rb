@@ -18,6 +18,8 @@ module Ramom
 
       attr_reader :base_relations
       attr_reader :virtual_relations
+      attr_reader :relations
+
       attr_reader :fk_constraints
       attr_reader :fk_attributes
       attr_reader :fk_mapping # TODO think about a better name
@@ -26,9 +28,14 @@ module Ramom
         super
         @base_relations    = context.base
         @virtual_relations = context.virtual
+        @relations         = @base_relations.merge(@virtual_relations)
         @fk_constraints    = context.fk_constraints
         @fk_attributes     = fk_constraints.source_attributes
         @fk_mapping        = initialize_fk_mapping
+      end
+
+      def external?(name)
+        relations.fetch(name).external?
       end
 
       private

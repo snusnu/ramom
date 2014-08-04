@@ -233,10 +233,12 @@ describe 'ramom' do
 
   it 'does allow to call external relations directly' do
     expect { db.schema.dashboard(1, 1) }.to_not raise_error
+    expect { db.schema.call(:dashboard, 1, 1) }.to_not raise_error
   end
 
   it 'does not allow to call internal relations directly' do
     expect { db.schema.employees(1) }.to raise_error(NoMethodError, /employees/)
+    expect { db.schema.call(:employees, 1) }.to raise_error(NoMethodError, /employees/)
   end
 
   it 'supports reading dressed base relations' do

@@ -44,13 +44,17 @@ module Ramom
       end
 
       def schema_relations
-        definition.base_relations.each_with_object({}) { |(name, relation), h|
-          h[name] = relation.gateway(adapter(relation))
-        }.merge(definition.virtual_relations)
+        definition.relations.each_with_object({}) { |(name, relation), h|
+          h[name] = schema_relation(relation)
+        }
       end
 
-      def adapter(relation)
-        adapters.fetch(relation.adapter)
+      def schema_relation(relation)
+        if relation.respond_to?(:adapter)
+          relation.gateway(adapters.fetch(relation.adapter))
+        else
+          relation
+        end
       end
     end # Builder
   end # Schema

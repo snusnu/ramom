@@ -9,6 +9,10 @@ module Ramom
         class Relation
           include Anima.new(:name, :visibility, :body)
 
+          def external?
+            visibility == :public
+          end
+
           class Base < self
             include anima.add(:adapter)
             include Anima::Update

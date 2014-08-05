@@ -9,15 +9,15 @@ module Ramom
 
           DM_ADAPTER_KEY = 'adapter'.freeze
 
+          def self.call(models, &block)
+            new(models).call(&block)
+          end
+
           def self.adapter(model)
             model.repository.adapter.options[DM_ADAPTER_KEY].to_sym
           end
 
           include Concord.new(:models, :context)
-
-          def self.call(models, &block)
-            new(models).call(&block)
-          end
 
           # This object mutates the injected +context+
           def initialize(_, context = Ramom::Schema::Definition::Context.new)

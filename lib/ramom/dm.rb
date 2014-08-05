@@ -30,6 +30,7 @@ module Ramom
 end # Ramom
 
 require 'ramom/dm/relation/builder'
+require 'ramom/dm/relation/registry'
 require 'ramom/dm/schema/definition/context/builder'
 require 'ramom/dm/writer'
 require 'ramom/dm/database'

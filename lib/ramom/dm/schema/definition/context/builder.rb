@@ -20,8 +20,6 @@ module Ramom
 
             include Concord.new(:models, :context)
 
-            public :context
-
             # This object mutates the injected +context+
             def initialize(_, context = Ramom::Schema::Definition::Context.new)
               super

@@ -34,15 +34,9 @@ module Ramom
           end
         end # AlreadyRegistered
 
-        DEFAULT_ATTRIBUTES = {
-          base:           {},
-          virtual:        {},
-          fk_constraints: FKConstraint::Set.new
-        }.freeze
-
         include Anima.new(:base, :virtual, :fk_constraints)
 
-        def initialize(attributes = DEFAULT_ATTRIBUTES, &block)
+        def initialize(attributes = DEFAULT_OPTIONS, &block)
           super(attributes.dup)
           call(&block) if block
         end

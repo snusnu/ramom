@@ -42,7 +42,7 @@ module Ramom
         end
 
         def call(&block)
-          instance_eval(&block)
+          instance_eval(&block) if block
           self
         end
 

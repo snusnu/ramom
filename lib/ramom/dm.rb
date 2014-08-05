@@ -6,7 +6,11 @@ module Ramom
     REJECT_FOR_SCHEMA_BUILDER = [:models, :dressers].freeze
 
     def self.schema_definition(models, &block)
-      Schema::Definition::Builder.call(models, &block)
+      Ramom::Schema::Definition.new(schema_definition_context(models, &block))
+    end
+
+    def self.schema_definition_context(models, &block)
+      Schema::Definition::Context::Builder.call(models, &block)
     end
 
     def self.environment(options, &block)
@@ -26,6 +30,6 @@ module Ramom
 end # Ramom
 
 require 'ramom/dm/relation/builder'
-require 'ramom/dm/schema/definition/builder'
+require 'ramom/dm/schema/definition/context/builder'
 require 'ramom/dm/writer'
 require 'ramom/dm/database'

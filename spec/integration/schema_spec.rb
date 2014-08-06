@@ -133,11 +133,15 @@ schema_definition = Ramom::DM.schema_definition(models) do
     with_page_info(
       employees(employment_id).
       join(people).
+      join(accounts).
       join(companies).
       join(page(instructions, [:instruction_date], 2, 2)).
       join(page(events,       [:event_created_at], 2, 2)).
       wrap(
-        person: h(people)
+        account: h(accounts)
+      ).
+      wrap(
+        person: h(people) << :account
       ).
       group(
         events:       h(events),
@@ -215,6 +219,8 @@ dressers = Ramom::Mom.definition_registry(schema_definition, names) do
     wrap :person do
       map :id
       map :name
+
+      wrap :account, entity: :account
     end
 
     wrap :events_page,       entity: :page_info
@@ -302,6 +308,9 @@ describe 'ramom' do
 
     expect(d.person.id).to_not be(nil)
     expect(d.person.name).to eq('person 1')
+
+    expect(d.person.account.id).to_not be(nil)
+    expect(d.person.account.login).to eq('operator')
 
     expect(d.events_page.number).to be(2)
     expect(d.events_page.limit).to be(2)

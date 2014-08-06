@@ -199,7 +199,8 @@ end
 # others.
 
 names = [
-  :employments
+  :employments,
+  #:accounts # This would map the :type (discriminator) attribute
 ].freeze
 
 dressers = Ramom::Mom.definition_registry(schema_definition, names) do
@@ -210,6 +211,7 @@ dressers = Ramom::Mom.definition_registry(schema_definition, names) do
     map :total
   end
 
+  # Explicitly registering :account allows to NOT map its :type attribute
   register :account do
     map :id
     map :login
@@ -342,6 +344,11 @@ describe 'ramom' do
     expect(o.id).to_not be(nil)
     expect(o.login).to eq('operator')
 
+    # If the :account dresser would've been generated
+    # automatically, the following expectation would hold
+    #
+    # expect(o.type).to eq(Account::Operator)
+
     employees = db.read(:employee_accounts).to_a
 
     expect(employees.size).to be(1)
@@ -349,6 +356,11 @@ describe 'ramom' do
     e = employees.first
     expect(e.id).to_not be(nil)
     expect(e.login).to eq('employee')
+
+    # If the :account dresser would've been generated
+    # automatically, the following expectation would hold
+    #
+    # expect(o.type).to eq(Account::Employee)
 
     accounts = db.read(:accounts).to_a
 

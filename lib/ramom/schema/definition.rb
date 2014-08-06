@@ -14,8 +14,6 @@ module Ramom
         new(Context.new(DEFAULT_OPTIONS.dup.merge(options), &block))
       end
 
-      include Concord.new(:context)
-
       attr_reader :base_relations
       attr_reader :virtual_relations
       attr_reader :relations
@@ -25,7 +23,6 @@ module Ramom
       attr_reader :fk_mapping # TODO think about a better name
 
       def initialize(context)
-        super
         @base_relations    = context.base
         @virtual_relations = context.virtual
         @relations         = @base_relations.merge(@virtual_relations)

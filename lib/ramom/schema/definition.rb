@@ -33,12 +33,12 @@ module Ramom
         @fk_attributes     = fk_constraints.source_attributes
         @fk_mapping        = initialize_fk_mapping
 
-        # Cache these because Schema#call relies on #relation?
-        @public_relations  = initialize_public_relation_cache
+        # Cache visibility because Schema#call relies on #relation?
+        @cache  = visibility_cache
       end
 
       def relation?(name, include_private = false)
-        (include_private ? relations : @public_relations).key?(name)
+        include_private ? @cache.key?(name) : @cache.fetch(name, false)
       end
 
       private
@@ -49,9 +49,9 @@ module Ramom
         }
       end
 
-      def initialize_public_relation_cache
+      def visibility_cache
         @relations.each_with_object({}) { |(name, relation), h|
-          h[name] = relation if relation.external?
+          h[name] = relation.external?
         }
       end
     end # Definition

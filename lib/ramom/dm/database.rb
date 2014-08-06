@@ -4,6 +4,13 @@ module Ramom
   module DM
     class Database < Ramom::Database
 
+      def self.build(schema_options, relation_registry)
+        schema = Ramom::Schema.build(schema_options)
+        writer = Writer.new(relation_registry)
+
+        new(schema, writer)
+      end
+
       def initialize(schema, writer)
         super(schema)
         @writer = writer

@@ -104,7 +104,7 @@ Instruction.create(
 
 puts
 
-models = DataMapper::Model.descendants # needed a few times
+models = Ramom::DM.relation_registry(DataMapper::Model.descendants)
 
 # (2) Initialize a new Ramom::Schema
 

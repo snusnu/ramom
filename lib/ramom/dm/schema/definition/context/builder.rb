@@ -33,7 +33,7 @@ module Ramom
             private
 
             def infer_base_relations
-              models.each_with_object({}) { |model, h|
+              models.each_with_object({}) { |(name, model), h|
 
                 fk_attributes = Set.new
                 with_fk_constraints(model) do |source_name, target_name, mapping|
@@ -41,7 +41,6 @@ module Ramom
                   fk_attributes.merge(mapping.keys)
                 end
 
-                name           = relation_name(model)
                 name_generator = Naming::NaturalJoin.new(name => fk_attributes)
                 base_relation  = Relation::Builder.call(model, name_generator)
 

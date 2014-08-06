@@ -5,27 +5,29 @@ module Ramom
 
     REJECT_FOR_SCHEMA_BUILDER = [:models, :dressers].freeze
 
-    def self.schema_definition(models, &block)
-      Ramom::Schema::Definition.new(schema_definition_context(models, &block))
+    def self.relation_registry(models, mapping = EMPTY_HASH)
+      Relation::Registry.build(models, mapping)
     end
 
-    def self.schema_definition_context(models, &block)
-      Schema::Definition::Context::Builder.call(models, &block)
+    def self.schema_definition_context(relation_registry, &block)
+      Schema::Definition::Context::Builder.call(relation_registry, &block)
     end
 
-    def self.environment(options, &block)
-      schema = Ramom::Schema.build(options.reject { |k|
+    def self.schema_definition(relation_registry, &block)
+      context = schema_definition_context(relation_registry, &block)
+      Ramom::Schema::Definition.new(context)
+    end
+
+    def self.environment(options)
+      schema_options = options.reject { |k|
         REJECT_FOR_SCHEMA_BUILDER.include?(k)
-      })
-
-      writer = Writer.build(options.fetch(:models), &block)
+      }
 
       Operation::Environment.new(
-        database: Database.new(schema, writer),
+        database: Database.build(schema_options, options.fetch(:models)),
         dressers: options.fetch(:dressers)
       )
     end
-
   end # DM
 end # Ramom
 

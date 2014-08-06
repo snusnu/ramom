@@ -5,10 +5,6 @@ module Ramom
 
     class Writer
 
-      def self.build(models, &block)
-        Relation::Registry.build(models, &block)
-      end
-
       include Concord::Public.new(:registry)
 
       def insert(relation_name, tuples)

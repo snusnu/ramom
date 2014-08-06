@@ -7,10 +7,9 @@ module Ramom
       class Registry
         include Lupo.collection(:relations)
 
-        def self.build(models, mapping)
+        def self.build(models, blacklist)
           new(models.each_with_object({}) { |model, h|
-            relation_name    = mapping.fetch(model, model.storage_name.to_sym)
-            h[relation_name] = model
+            h[model.storage_name.to_sym] = model unless blacklist.include?(model)
           })
         end
 

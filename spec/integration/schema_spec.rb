@@ -29,11 +29,24 @@ class Company
   property :name, String, required: true
 end
 
+class Account
+  include DataMapper::Resource
+
+  property :id,    Serial
+  property :login, String, unique: true
+  property :type,  Discriminator
+
+  class Operator < self; end
+  class Employee < self; end
+end
+
 class Person
   include DataMapper::Resource
 
   property :id,   Serial
   property :name, String, required: true
+
+  belongs_to :account
 end
 
 class Employment
@@ -69,8 +82,10 @@ DataMapper.finalize.auto_migrate!
 
 company_1    = Company.create(name: 'company 1')
 company_2    = Company.create(name: 'company 2')
-person_1     = Person.create(name: 'person 1')
-person_2     = Person.create(name: 'person 2')
+account_1    = Account::Operator.create(login: 'operator')
+account_2    = Account::Employee.create(login: 'employee')
+person_1     = Person.create(name: 'person 1', account: account_1)
+person_2     = Person.create(name: 'person 2', account: account_2)
 employment_1 = Employment.create(company: company_1, person: person_1)
 employment_2 = Employment.create(company: company_2, person: person_2)
 
@@ -104,7 +119,10 @@ Instruction.create(
 
 puts
 
-models = Ramom::DM.relation_registry(DataMapper::Model.descendants)
+models = Ramom::DM.relation_registry(DataMapper::Model.descendants, [
+  Account::Operator,
+  Account::Employee
+])
 
 # (2) Initialize a new Ramom::Schema
 
@@ -136,6 +154,14 @@ schema_definition = Ramom::DM.schema_definition(models) do
         rel: company_events(company_id)
       }
     )
+  end
+
+  external :employee_accounts do
+    accounts.restrict(account_type: 'Account::Employee')
+  end
+
+  external :operator_accounts do
+    accounts.restrict(account_type: 'Account::Operator')
   end
 
   internal :employees do |employment_id|
@@ -178,6 +204,11 @@ dressers = Ramom::Mom.definition_registry(schema_definition, names) do
     map :number
     map :limit
     map :total
+  end
+
+  register :account do
+    map :id
+    map :login
   end
 
   register :dashboard do
@@ -226,6 +257,18 @@ end
 
 Q.register :dashboard, dresser: :dashboard do |params|
   one(rel(:dashboard, params[:company_id], params[:employment_id]))
+end
+
+Q.register :accounts, dresser: :account do
+  read(rel(:accounts))
+end
+
+Q.register :employee_accounts, dresser: :account do
+  read(rel(:employee_accounts))
+end
+
+Q.register :operator_accounts, dresser: :account do
+  read(rel(:operator_accounts))
 end
 
 describe 'ramom' do
@@ -279,5 +322,29 @@ describe 'ramom' do
     expect(d.instructions.first.id).to_not be(nil)
     expect(d.instructions.first.name).to eq("instruction 3")
     expect(d.instructions.first.date).to eq(DateTime.new(2014, 7, 3))
+  end
+
+  it 'supports accessing DataMapper STI hierarchies' do
+    operators = db.read(:operator_accounts).to_a
+
+    expect(operators.size).to be(1)
+
+    o = operators.first
+    expect(o.id).to_not be(nil)
+    expect(o.login).to eq('operator')
+
+    employees = db.read(:employee_accounts).to_a
+
+    expect(employees.size).to be(1)
+
+    e = employees.first
+    expect(e.id).to_not be(nil)
+    expect(e.login).to eq('employee')
+
+    accounts = db.read(:accounts).to_a
+
+    expect(accounts.size).to be(2)
+    expect(accounts).to include(o)
+    expect(accounts).to include(e)
   end
 end

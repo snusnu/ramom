@@ -66,8 +66,8 @@ module Ramom
         }
       end
 
-      def fk_wrapped_rel(name)
-        FKWrapper.call(name, call(name), @fk_constraints)
+      def fk_wrapped_rel(name, *args)
+        FKWrapper.call(name, call(name, *args), @fk_constraints)
       end
 
       private

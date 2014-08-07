@@ -22,8 +22,8 @@ module Ramom
 
     alias_method :rel, :relation
 
-    def fk_wrapped_rel(name)
-      schema.fk_wrapped_rel(name)
+    def fk_wrapped_rel(name, *args)
+      schema.fk_wrapped_rel(name, *args)
     end
 
   end # Database

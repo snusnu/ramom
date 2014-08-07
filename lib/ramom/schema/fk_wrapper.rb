@@ -4,12 +4,11 @@ module Ramom
   class Schema < BasicObject
 
     class FKWrapper
-      include Concord.new(:name, :relation, :fkc_set)
+      include Concord.new(:relation, :fkc_set)
 
-      def self.call(name, relation, fk_constraints)
-        fkc_set = fk_constraints.fetch(name)
+      def self.call(relation, fkc_set)
         return relation if fkc_set.empty?
-        new(name, relation, fkc_set).call
+        new(relation, fkc_set).call
       end
 
       def call

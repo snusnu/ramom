@@ -25,5 +25,9 @@ module Ramom
       db.fk_wrapped_rel(relation, *args)
     end
 
+    def fk_wrapped(relation, base_relation_name)
+      db.fk_wrapped(relation, base_relation_name)
+    end
+
   end # Query
 end # Ramom

@@ -200,6 +200,7 @@ end
 
 names = [
   :employments,
+  :people,
  #:accounts # This would map the :type (discriminator) attribute
 ].freeze
 
@@ -263,6 +264,10 @@ Q.register :employments, dresser: :employment do
   read(fk_wrapped_rel(:employments))
 end
 
+Q.register :person_with_id, dresser: :person do |id|
+  one(fk_wrapped(rel(:people).restrict(person_id: id), :people))
+end
+
 Q.register :dashboard, dresser: :dashboard do |params|
   one(rel(:dashboard, params[:company_id], params[:employment_id]))
 end
@@ -297,12 +302,20 @@ describe 'ramom' do
     expect { db.schema.call(:employees, 1) }.to raise_error(NoMethodError, /employees/)
   end
 
-  it 'supports reading dressed base relations' do
+  it 'supports reading dressed base relations with wrapped FKs' do
     db.read(:employments).each_with_index do |employment, i|
       expect(employment.id).to_not be(nil)
       expect(employment.company.id).to_not be(nil)
       expect(employment.person.id).to_not be(nil)
     end
+  end
+
+  it 'supports reading dressed restricted base relations with wrapped FKs' do
+    p = db.read(:person_with_id, 1)
+
+    expect(p.id).to be(1)
+    expect(p.name).to eq('person 1')
+    expect(p.account.id).to_not be(nil)
   end
 
   it 'supports reading dressed virtual relations' do

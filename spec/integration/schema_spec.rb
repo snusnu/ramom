@@ -62,7 +62,7 @@ class Event
   include DataMapper::Resource
 
   property :id,         Serial
-  property :name,       String, required: true
+  property :name,       String,   required: true
   property :created_at, DateTime, required: true
 
   belongs_to :company
@@ -119,6 +119,11 @@ Instruction.create(
 
 puts
 
+# The array passed as 2nd parameter consists of a list of datamapper
+# model classes that are subclasses in an STI hierarchy. No base
+# relations will be generated for those. Being able to access certain
+# relations that are restricted to a subtype, simply involves
+# defining those relations explicitly.
 models = Ramom::DM.relation_registry(DataMapper::Model.descendants, [
   Account::Operator,
   Account::Employee

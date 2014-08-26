@@ -26,8 +26,8 @@ module Ramom
       Orc::Result.success(object)
     end
 
-    def failure(status, context)
-      Orc::Result.failure(status, context)
+    def failure(context, status = :failure)
+      Orc::Result.failure(context, status)
     end
   end # Operation
 end # Ramom

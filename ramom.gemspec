@@ -21,7 +21,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'anima',            '~> 0.2', '>= 0.2.0'
   gem.add_dependency 'lupo',             '~> 0.0', '>= 0.0.1'
   gem.add_dependency 'procto',           '~> 0.0', '>= 0.0.2'
-  gem.add_dependency 'orc',              '~> 0.0', '>= 0.0.1'
+  gem.add_dependency 'orc',              '~> 0.0', '>= 0.0.3'
   gem.add_dependency 'morpher',          '~> 0.2', '>= 0.2.3'
   gem.add_dependency 'adamantium',       '~> 0.2', '>= 0.2.0'
   gem.add_dependency 'abstract_type',    '~> 0.0', '>= 0.0.7'

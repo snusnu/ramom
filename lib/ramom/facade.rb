@@ -28,5 +28,9 @@ module Ramom
     def write(name, *args, &block)
       commands.fetch(name).call(*args, &block)
     end
+
+    def rel(name, *args, &block)
+      schema.rel(name, *args, &block)
+    end
   end # Facade
 end # Ramom
